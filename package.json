@@ -10,6 +10,7 @@
     "prepare": "husky",
     "commitlint": "commitlint --edit",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
