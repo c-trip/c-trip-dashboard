@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { ApiError, parseApiError } from "@/lib/api/errors";
 import { SESSION_COOKIE } from "@/lib/auth/constants";
 
-const API_URL = process.env.API_URL ?? "http://localhost:8000";
+const API_URL = process.env.API_URL;
 
 type ApiFetchOptions = Omit<RequestInit, "body"> & {
   /** Corpo do pedido — serializado como JSON automaticamente. */

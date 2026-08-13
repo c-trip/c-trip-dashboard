@@ -25,7 +25,7 @@ export function CreateRouteForm({ cities }: CreateRouteFormProps) {
           name="origin_city_id"
           required
           defaultValue=""
-          className="h-8 rounded-lg border border-input bg-background px-2.5 text-sm"
+          className="h-10 rounded-lg border border-input bg-background px-3 text-sm"
         >
           <option value="" disabled>
             Escolhe uma cidade
@@ -47,7 +47,7 @@ export function CreateRouteForm({ cities }: CreateRouteFormProps) {
           name="destination_city_id"
           required
           defaultValue=""
-          className="h-8 rounded-lg border border-input bg-background px-2.5 text-sm"
+          className="h-10 rounded-lg border border-input bg-background px-3 text-sm"
         >
           <option value="" disabled>
             Escolhe uma cidade

@@ -32,7 +32,7 @@ export function SimpleTable<T>({ columns, rows, rowKey, emptyTitle, emptyDescrip
         <thead>
           <tr className="border-b border-border bg-muted/50 text-left">
             {columns.map((column) => (
-              <th key={column.header} className={cn("px-3.5 py-2.5 font-medium text-muted-foreground", column.className)}>
+              <th key={column.header} className={cn("px-5 py-3.5 font-medium text-muted-foreground", column.className)}>
                 {column.header}
               </th>
             ))}
@@ -42,7 +42,7 @@ export function SimpleTable<T>({ columns, rows, rowKey, emptyTitle, emptyDescrip
           {rows.map((row) => (
             <tr key={rowKey(row)} className="border-b border-border last:border-0 hover:bg-muted/30">
               {columns.map((column) => (
-                <td key={column.header} className={cn("px-3.5 py-2.5", column.className)}>
+                <td key={column.header} className={cn("px-5 py-3.5", column.className)}>
                   {column.cell(row)}
                 </td>
               ))}

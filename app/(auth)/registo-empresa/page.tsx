@@ -7,8 +7,7 @@ export default function RegistoEmpresaPage() {
       <CardHeader>
         <CardTitle>Registar transportadora</CardTitle>
         <CardDescription>
-          Cria a empresa e a tua conta de gestor num único passo. A empresa fica &quot;pendente&quot; até a C-Trip
-          aprovar — já podes entrar entretanto para preparar rotas e frota.
+          Cria a empresa e a tua conta de gestor num único passo.
         </CardDescription>
       </CardHeader>
       <CardContent>
