@@ -8,6 +8,10 @@ import { login } from "@/lib/api/auth";
 import { registerCompany } from "@/lib/api/companies";
 import { SESSION_COOKIE } from "@/lib/auth/constants";
 import { actionErrorState, type ActionState } from "@/lib/forms/action-state";
+import {
+  parseFullPhone,
+  validatePhoneNumber,
+} from "@/lib/forms/phone-countries";
 
 const schema = z.object({
   name: z.string().min(1, { message: "Nome da empresa é obrigatório." }),
@@ -20,10 +24,23 @@ const schema = z.object({
   responsible_id_document: z.string().min(1, { message: "Campo obrigatório." }),
 });
 
-export async function registerCompanyAction(_prevState: ActionState, formData: FormData): Promise<ActionState> {
+export async function registerCompanyAction(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
   const parsed = schema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
     return { fieldErrors: parsed.error.flatten().fieldErrors };
+  }
+
+  const { dialCode, digits } = parseFullPhone(parsed.data.phone);
+  const phoneValidation = validatePhoneNumber(digits, dialCode);
+  if (!phoneValidation.ok) {
+    return {
+      fieldErrors: {
+        phone: [phoneValidation.message ?? "Número de telefone inválido."],
+      },
+    };
   }
 
   try {
