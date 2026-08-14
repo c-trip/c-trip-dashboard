@@ -1,20 +1,33 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 import { loginAction } from "./actions";
-import { FormError, FormField } from "@/components/forms/form-field";
+import { FormField } from "@/components/forms/form-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { initialActionState } from "@/lib/forms/action-state";
 
 export function LoginForm() {
+  const router = useRouter();
   const [state, action, pending] = useActionState(loginAction, initialActionState);
+
+  useEffect(() => {
+    if (state.formError) {
+      toast.error(state.formError);
+      return;
+    }
+    if (state.success) {
+      toast.success("Login efetuado com sucesso.");
+      router.replace("/");
+    }
+  }, [state.formError, state.success, router]);
 
   return (
     <form action={action} className="flex flex-col gap-4">
-      <FormError message={state.formError} />
       <FormField htmlFor="email" label="Email" error={state.fieldErrors?.email}>
         <Input id="email" name="email" type="email" autoComplete="email" required />
       </FormField>

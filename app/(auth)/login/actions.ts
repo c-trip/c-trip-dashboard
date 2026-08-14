@@ -1,7 +1,6 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { login } from "@/lib/api/auth";
@@ -39,6 +38,6 @@ export async function loginAction(_prevState: ActionState, formData: FormData): 
     return actionErrorState(error);
   }
 
-  // A decisão de ir para /empresa ou /admin fica em app/page.tsx, a partir do role.
-  redirect("/");
+  // O formulário mostra o toast de sucesso e navega para "/" (que decide o destino pelo role).
+  return { success: true };
 }

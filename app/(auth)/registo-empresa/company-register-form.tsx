@@ -1,10 +1,11 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 import { registerCompanyAction } from "./actions";
-import { FormError, FormField } from "@/components/forms/form-field";
+import { FormField } from "@/components/forms/form-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { initialActionState } from "@/lib/forms/action-state";
@@ -12,10 +13,12 @@ import { initialActionState } from "@/lib/forms/action-state";
 export function CompanyRegisterForm() {
   const [state, action, pending] = useActionState(registerCompanyAction, initialActionState);
 
+  useEffect(() => {
+    if (state.formError) toast.error(state.formError);
+  }, [state.formError]);
+
   return (
     <form action={action} className="flex flex-col gap-4">
-      <FormError message={state.formError} />
-
       <div className="grid grid-cols-2 gap-3">
         <FormField htmlFor="name" label="Nome da empresa" error={state.fieldErrors?.name} className="col-span-2">
           <Input id="name" name="name" required />
