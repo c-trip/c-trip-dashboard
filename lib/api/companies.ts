@@ -26,7 +26,11 @@ export interface RegisteredCompany {
 }
 
 export function registerCompany(input: RegisterCompanyInput) {
-  return apiFetch<RegisteredCompany>("/companies/register", { method: "POST", body: input, auth: false });
+  return apiFetch<RegisteredCompany>("/companies/register", {
+    method: "POST",
+    body: input,
+    auth: false,
+  });
 }
 
 export interface CompanyProfile {
@@ -45,7 +49,10 @@ export interface UpdateCompanyProfileInput {
 }
 
 export function updateCompanyProfile(input: UpdateCompanyProfileInput) {
-  return apiFetch<CompanyProfile>("/companies/profile", { method: "PATCH", body: input });
+  return apiFetch<CompanyProfile>("/companies/profile", {
+    method: "PATCH",
+    body: input,
+  });
 }
 
 export interface CompanyUser {
@@ -67,11 +74,17 @@ export interface CreateCollaboratorInput {
 }
 
 export function createCollaborator(input: CreateCollaboratorInput) {
-  return apiFetch<CompanyUser>("/companies/users", { method: "POST", body: input });
+  return apiFetch<CompanyUser>("/companies/users", {
+    method: "POST",
+    body: input,
+  });
 }
 
 export function removeCollaborator(userId: string) {
-  return apiFetch<{ id: string; is_active: boolean }>(`/companies/users/${userId}`, { method: "DELETE" });
+  return apiFetch<{ id: string; is_active: boolean }>(
+    `/companies/users/${userId}`,
+    { method: "DELETE" },
+  );
 }
 
 export interface CompanyPermission {
@@ -101,7 +114,10 @@ export interface CollaboratorRole {
  * o array enviado aqui tem de ser a lista completa desejada, não só o que mudou.
  * Ver Docs/C-Trip_Guia_Frontend.pdf, "Definir Permissões do Colaborador".
  */
-export function replaceCollaboratorPermissions(userId: string, permissionCodes: string[]) {
+export function replaceCollaboratorPermissions(
+  userId: string,
+  permissionCodes: string[],
+) {
   return apiFetch<CollaboratorRole>(`/companies/users/${userId}/permissions`, {
     method: "POST",
     body: { permission_codes: permissionCodes },
@@ -121,17 +137,19 @@ export function getCompanyRoles() {
   return apiFetch<CompanyRoleSummary[]>("/companies/roles");
 }
 
-/**
- * Gotcha do backend: ao contrário de quase todos os outros POST da API, este usa
- * QUERY STRING, não corpo JSON. Confirmado no guia de integração, secção "Empresa".
- */
 export function assignCompanyRole(userId: string, roleId: string) {
   const params = new URLSearchParams({ user_id: userId, role_id: roleId });
-  return apiFetch<{ detail: string }>(`/companies/roles/assign?${params.toString()}`, { method: "POST" });
+  return apiFetch<{ detail: string }>(
+    `/companies/roles/assign?${params.toString()}`,
+    { method: "POST" },
+  );
 }
 
 export function removeCompanyRole(roleId: string, userId: string) {
-  return apiFetch<{ detail: string }>(`/companies/roles/${roleId}/users/${userId}`, { method: "DELETE" });
+  return apiFetch<{ detail: string }>(
+    `/companies/roles/${roleId}/users/${userId}`,
+    { method: "DELETE" },
+  );
 }
 
 export interface CollaboratorRoles {
