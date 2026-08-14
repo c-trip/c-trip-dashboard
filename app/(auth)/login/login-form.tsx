@@ -1,7 +1,9 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "gooey-toast";
 import { IconEye, IconEyeOff, IconMail } from "@tabler/icons-react";
 
 import { loginAction } from "./actions";
@@ -9,6 +11,15 @@ import { FormError, FormField } from "@/components/forms/form-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { initialActionState } from "@/lib/forms/action-state";
+import {
+  collectInvalidFields,
+  invalidFieldsMessage,
+} from "@/lib/forms/client-validation";
+
+const FIELD_LABELS: Record<string, string> = {
+  email: "Email",
+  password: "Password",
+};
 
 export function LoginForm() {
   const [state, action, pending] = useActionState(
@@ -16,9 +27,54 @@ export function LoginForm() {
     initialActionState,
   );
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
+  const prevState = useRef(state);
+
+  useEffect(() => {
+    const prev = prevState.current;
+    prevState.current = state;
+    if (state === prev) return;
+
+    if (state.success) {
+      toast.success({
+        title: "Login bem-sucedido!",
+        description: "A entrar na tua conta…",
+      });
+      const timeout = setTimeout(() => {
+        router.push(state.redirectTo ?? "/");
+      }, 800);
+      return () => clearTimeout(timeout);
+    }
+
+    if (state.formError) {
+      toast.error({
+        title: "Erro no login",
+        description: state.formError,
+      });
+    }
+  }, [state, router]);
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    const invalid = collectInvalidFields(
+      e.currentTarget,
+      (name) => FIELD_LABELS[name],
+    );
+    if (invalid.empty.length > 0 || invalid.invalid.length > 0) {
+      e.preventDefault();
+      toast.error({
+        title: "Formulário incompleto",
+        description: invalidFieldsMessage(invalid),
+      });
+    }
+  }
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form
+      action={action}
+      onSubmit={handleSubmit}
+      noValidate
+      className="flex flex-col gap-4"
+    >
       <FormError message={state.formError} />
       <FormField htmlFor="email" label="Email" error={state.fieldErrors?.email}>
         <div className="relative">

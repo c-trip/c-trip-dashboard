@@ -1,7 +1,6 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { login } from "@/lib/api/auth";
@@ -63,5 +62,5 @@ export async function registerCompanyAction(
     return actionErrorState(error);
   }
 
-  redirect("/empresa?onboarding=1");
+  return { success: true, redirectTo: "/empresa?onboarding=1" };
 }

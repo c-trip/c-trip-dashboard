@@ -7,6 +7,7 @@ export interface ActionState {
   fieldErrors?: Record<string, string[]>;
   formError?: string;
   success?: boolean;
+  redirectTo?: string;
 }
 
 export const initialActionState: ActionState = {};

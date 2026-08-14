@@ -1,7 +1,6 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { login } from "@/lib/api/auth";
@@ -13,7 +12,10 @@ const schema = z.object({
   password: z.string().min(1, { message: "Introduz a password." }),
 });
 
-export async function loginAction(_prevState: ActionState, formData: FormData): Promise<ActionState> {
+export async function loginAction(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
   const parsed = schema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -40,5 +42,5 @@ export async function loginAction(_prevState: ActionState, formData: FormData): 
   }
 
   // A decisão de ir para /empresa ou /admin fica em app/page.tsx, a partir do role.
-  redirect("/");
+  return { success: true, redirectTo: "/" };
 }

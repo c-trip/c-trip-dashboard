@@ -1,7 +1,9 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "gooey-toast";
 import {
   IconEye,
   IconEyeOff,
@@ -22,6 +24,21 @@ import {
   validatePhoneNumber,
 } from "@/lib/forms/phone-countries";
 import { initialActionState } from "@/lib/forms/action-state";
+import {
+  collectInvalidFields,
+  invalidFieldsMessage,
+} from "@/lib/forms/client-validation";
+
+const FIELD_LABELS: Record<string, string> = {
+  name: "Nome da empresa",
+  email: "Email",
+  password: "Password",
+  phone: "Telefone",
+  nif: "NIF",
+  address: "Morada",
+  responsible_name: "Nome do responsável",
+  responsible_id_document: "Documento de identificação",
+};
 
 export function CompanyRegisterForm() {
   const [state, action, pending] = useActionState(
@@ -33,22 +50,60 @@ export function CompanyRegisterForm() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [documentFiles, setDocumentFiles] = useState<File[]>([]);
+  const router = useRouter();
+  const prevState = useRef(state);
+
+  useEffect(() => {
+    const prev = prevState.current;
+    prevState.current = state;
+    if (state === prev) return;
+
+    if (state.success) {
+      toast.success({
+        title: "Empresa registada!",
+        description: "Conta criada — a aguardar aprovação da C-Trip.",
+      });
+      const timeout = setTimeout(() => {
+        router.push(state.redirectTo ?? "/empresa");
+      }, 800);
+      return () => clearTimeout(timeout);
+    }
+
+    if (state.formError) {
+      toast.error({
+        title: "Não foi possível registar",
+        description: state.formError,
+      });
+    }
+  }, [state, router]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    const validation = validatePhoneNumber(
-      phoneNumber.replace(/\D/g, ""),
-      dialCode,
+    const invalid = collectInvalidFields(
+      e.currentTarget,
+      (name) => FIELD_LABELS[name],
     );
-    if (!validation.ok) {
-      e.preventDefault();
-      setPhoneError(validation.message ?? "Número de telefone inválido.");
+    const phoneDigits = phoneNumber.replace(/\D/g, "");
+    const phoneValidation = validatePhoneNumber(phoneDigits, dialCode);
+    if (phoneDigits && !phoneValidation.ok) {
+      invalid.invalid.push("Telefone");
     }
+    if (invalid.empty.length === 0 && invalid.invalid.length === 0) return;
+
+    e.preventDefault();
+    if (!phoneValidation.ok) {
+      setPhoneError(phoneValidation.message ?? "Número de telefone inválido.");
+    }
+    toast.error({
+      title: "Formulário incompleto",
+      description: invalidFieldsMessage(invalid),
+    });
   }
 
   return (
     <form
       action={action}
       onSubmit={handleSubmit}
+      noValidate
       className="flex flex-col gap-5"
     >
       <FormError message={state.formError} />
