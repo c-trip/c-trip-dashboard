@@ -121,3 +121,52 @@ export function assignGlobalRole(userId: string, roleId: string) {
     body: { user_id: userId, role_id: roleId },
   });
 }
+
+export interface AdminUserRole {
+  id: string;
+  nome: string;
+}
+
+export function getUserRoles(userId: string) {
+  return apiFetch<AdminUserRole[]>(`/admin/users/${userId}/roles`);
+}
+
+export interface CreateGlobalRoleInput {
+  nome: string;
+  descricao: string;
+}
+
+export function createGlobalRole(input: CreateGlobalRoleInput) {
+  return apiFetch<{ id: string; nome: string; descricao: string }>("/admin/roles", {
+    method: "POST",
+    body: input,
+  });
+}
+
+export interface GlobalRoleDetail {
+  id: string;
+  nome: string;
+  descricao: string;
+  empresa_id: null;
+  is_system: boolean;
+  permissions: PlatformPermission[];
+}
+
+export function getGlobalRole(roleId: string) {
+  return apiFetch<GlobalRoleDetail>(`/admin/roles/${roleId}`);
+}
+
+export function deleteGlobalRole(roleId: string) {
+  return apiFetch<{ detail: string }>(`/admin/roles/${roleId}`, { method: "DELETE" });
+}
+
+export function updateGlobalRolePermissions(roleId: string, permissionCodes: string[]) {
+  return apiFetch<{ id: string; permission_count: number }>(`/admin/roles/${roleId}/permissions`, {
+    method: "PATCH",
+    body: { permission_codes: permissionCodes },
+  });
+}
+
+export function removeGlobalRoleUser(roleId: string, userId: string) {
+  return apiFetch<{ detail: string }>(`/admin/roles/${roleId}/users/${userId}`, { method: "DELETE" });
+}

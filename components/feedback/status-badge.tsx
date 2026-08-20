@@ -7,8 +7,6 @@ interface StatusMeta {
   tone: Tone;
 }
 
-// Fonte única de verdade para cor/label de todos os enums do guia de integração
-// (Docs/C-Trip_Guia_Frontend.pdf, secção 7 "Referência Rápida").
 const TABLES = {
   company: {
     pending: { label: "Pendente", tone: "warning" },
@@ -66,8 +64,13 @@ export function StatusBadge({ domain, status, className }: StatusBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium whitespace-nowrap",
+        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap ring-1 ring-inset",
         TONE_CLASSES[meta.tone],
+        meta.tone === "positive" && "ring-emerald-500/20",
+        meta.tone === "warning" && "ring-amber-500/20",
+        meta.tone === "negative" && "ring-destructive/20",
+        meta.tone === "info" && "ring-sky-500/20",
+        meta.tone === "neutral" && "ring-border",
         className
       )}
     >

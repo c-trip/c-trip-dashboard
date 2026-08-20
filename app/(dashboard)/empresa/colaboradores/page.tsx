@@ -10,10 +10,10 @@ export default async function ColaboradoresPage() {
   const users = await getCompanyUsers();
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6 animate-fade-in">
       <div>
-        <h2 className="text-lg font-semibold text-foreground">Colaboradores</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="text-xl font-bold tracking-tight text-foreground">Colaboradores</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
           Uma conta nova nasce sem permissões — o segundo passo é sempre defini-las.
         </p>
       </div>
@@ -22,13 +22,14 @@ export default async function ColaboradoresPage() {
         rows={users}
         rowKey={(user) => user.id}
         emptyTitle="Ainda não há colaboradores"
+        emptyDescription="Adiciona o primeiro colaborador para começar a atribuir tarefas e permissões."
         columns={[
-          { header: "Nome", cell: (u) => u.name },
+          { header: "Nome", cell: (u) => <span className="font-medium">{u.name}</span> },
           { header: "Email", cell: (u) => u.email },
           {
             header: "Estado",
             cell: (u) => (
-              <span className={u.is_active ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}>
+              <span className={u.is_active ? "text-emerald-600 dark:text-emerald-400 font-medium" : "text-muted-foreground"}>
                 {u.is_active ? "Activo" : "Desactivado"}
               </span>
             ),

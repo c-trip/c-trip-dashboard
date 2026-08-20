@@ -30,7 +30,7 @@ export default async function EmpresaLayout({ children }: { children: ReactNode 
           que o backend expuser uma leitura do perfil — o guia só lista PATCH
           /companies/profile, sem GET. Ver components/dashboard/company-status-banner.tsx.
         */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto bg-muted/20 p-4 md:p-8">{children}</main>
       </div>
     </div>
   );

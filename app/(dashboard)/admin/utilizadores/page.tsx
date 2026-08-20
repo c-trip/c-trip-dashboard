@@ -13,10 +13,10 @@ export default async function UtilizadoresPage({ searchParams }: PageProps<"/adm
   const users = await getAllUsers(LIMIT, offset);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6 animate-fade-in">
       <div>
-        <h2 className="text-lg font-semibold text-foreground">Utilizadores</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="text-xl font-bold tracking-tight text-foreground">Utilizadores</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
           Todas as contas da plataforma — passageiros, colaboradores, gestores.
         </p>
       </div>
@@ -25,20 +25,19 @@ export default async function UtilizadoresPage({ searchParams }: PageProps<"/adm
         rowKey={(user) => user.id}
         emptyTitle="Nenhum utilizador nesta página"
         columns={[
-          { header: "Nome", cell: (u) => u.name },
+          { header: "Nome", cell: (u) => <span className="font-medium">{u.name}</span> },
           { header: "Email", cell: (u) => u.email },
           { header: "Papel", cell: (u) => u.role },
           {
             header: "Estado",
             cell: (u) => (
-              <span className={u.is_active ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}>
+              <span className={u.is_active ? "text-emerald-600 dark:text-emerald-400 font-medium" : "text-muted-foreground"}>
                 {u.is_active ? "Activo" : "Desactivado"}
               </span>
             ),
           },
         ]}
       />
-      {/* A API não devolve total de registos — só dá para avançar/recuar, nunca "página X de Y". */}
       <div className="flex items-center justify-between text-sm text-muted-foreground">
         <span>A mostrar {users.length} a partir de {offset}.</span>
         <div className="flex gap-2">

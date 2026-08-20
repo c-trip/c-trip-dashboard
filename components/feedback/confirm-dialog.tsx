@@ -14,11 +14,6 @@ interface ConfirmDialogProps {
   onConfirm: () => Promise<void> | void;
 }
 
-/**
- * Confirmação explícita antes de qualquer acção pesada/irreversível — remover
- * colaborador, cancelar viagem, apagar role, suspender/rejeitar empresa — como
- * pede o guia de UI/UX. Usa <dialog> nativo, sem dependências extra.
- */
 export function ConfirmDialog({
   trigger,
   title,
@@ -37,16 +32,20 @@ export function ConfirmDialog({
       <span onClick={() => dialogRef.current?.showModal()}>{trigger}</span>
       <dialog
         ref={dialogRef}
-        className="m-auto w-full max-w-md rounded-xl border border-border bg-card p-0 text-card-foreground shadow-lg backdrop:bg-black/40"
+        className="m-auto w-full max-w-md rounded-xl border border-border bg-card p-0 text-card-foreground shadow-xl backdrop:bg-black/50 backdrop:backdrop-blur-sm"
         onClose={() => setError(null)}
       >
-        <div className="flex flex-col gap-5 p-6">
+        <div className="flex flex-col gap-6 p-6">
           <div className="flex flex-col gap-2">
-            <h2 className="text-lg font-semibold">{title}</h2>
-            <p className="text-sm text-muted-foreground">{description}</p>
+            <h2 className="text-lg font-bold tracking-tight">{title}</h2>
+            <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
           </div>
-          {error ? <p className="text-sm text-destructive">{error}</p> : null}
-          <div className="flex justify-end gap-2">
+          {error ? (
+            <div className="rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm font-medium text-destructive">
+              {error}
+            </div>
+          ) : null}
+          <div className="flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={() => dialogRef.current?.close()}>
               {cancelLabel}
             </Button>
@@ -66,7 +65,7 @@ export function ConfirmDialog({
                 });
               }}
             >
-              {pending ? "A processar…" : confirmLabel}
+              {pending ? "A processar\u2026" : confirmLabel}
             </Button>
           </div>
         </div>

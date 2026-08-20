@@ -14,11 +14,13 @@ interface FormFieldProps {
 
 export function FormField({ htmlFor, label, error, hint, children, className }: FormFieldProps) {
   return (
-    <div className={cn("flex flex-col gap-1.5", className)}>
-      <Label htmlFor={htmlFor}>{label}</Label>
+    <div className={cn("flex flex-col gap-2", className)}>
+      <Label htmlFor={htmlFor} className="text-sm font-semibold">
+        {label}
+      </Label>
       {children}
       {error?.length ? (
-        <p className="text-xs text-destructive">{error[0]}</p>
+        <p className="text-xs font-medium text-destructive">{error[0]}</p>
       ) : hint ? (
         <p className="text-xs text-muted-foreground">{hint}</p>
       ) : null}
@@ -29,8 +31,8 @@ export function FormField({ htmlFor, label, error, hint, children, className }: 
 export function FormError({ message }: { message?: string }) {
   if (!message) return null;
   return (
-    <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+    <div className="rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm font-medium text-destructive">
       {message}
-    </p>
+    </div>
   );
 }
