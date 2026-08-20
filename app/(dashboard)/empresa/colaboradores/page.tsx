@@ -1,5 +1,6 @@
 import { CollaboratorRowActions } from "./collaborator-row-actions";
 import { CreateCollaboratorForm } from "./create-collaborator-form";
+import { CompanyBlocked } from "@/components/feedback/company-blocked";
 import { SimpleTable } from "@/components/tables/simple-table";
 import { getCompanyUsers } from "@/lib/api/companies";
 import { PERMISSIONS } from "@/lib/auth/permissions";
@@ -7,7 +8,20 @@ import { requirePermission } from "@/lib/auth/session";
 
 export default async function ColaboradoresPage() {
   await requirePermission(PERMISSIONS.companyReadUsers);
-  const users = await getCompanyUsers();
+
+  let users;
+  try {
+    users = await getCompanyUsers();
+  } catch {
+    return (
+      <div className="flex flex-col gap-6 animate-fade-in">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">Colaboradores</h2>
+        </div>
+        <CompanyBlocked />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6 animate-fade-in">

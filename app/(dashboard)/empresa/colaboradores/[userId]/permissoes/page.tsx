@@ -1,3 +1,4 @@
+import { CompanyBlocked } from "@/components/feedback/company-blocked";
 import { PermissionForm } from "./permission-form";
 import { getAssignableCompanyPermissions, getCollaboratorRoles } from "@/lib/api/companies";
 import { PERMISSIONS } from "@/lib/auth/permissions";
@@ -9,10 +10,22 @@ export default async function ColaboradorPermissoesPage({
   await requirePermission(PERMISSIONS.companyRoleRead);
   const { userId } = await params;
 
-  const [options, current] = await Promise.all([
-    getAssignableCompanyPermissions(),
-    getCollaboratorRoles(userId),
-  ]);
+  let options, current;
+  try {
+    [options, current] = await Promise.all([
+      getAssignableCompanyPermissions(),
+      getCollaboratorRoles(userId),
+    ]);
+  } catch {
+    return (
+      <div className="flex max-w-2xl flex-col gap-6 animate-fade-in">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">Permissões do colaborador</h2>
+        </div>
+        <CompanyBlocked />
+      </div>
+    );
+  }
 
   return (
     <div className="flex max-w-2xl flex-col gap-6 animate-fade-in">

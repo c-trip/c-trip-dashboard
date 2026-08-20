@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { CompanyBlocked } from "@/components/feedback/company-blocked";
 import { ScheduleRowActions } from "./schedule-row-actions";
 import { SimpleTable } from "@/components/tables/simple-table";
 import { StatusBadge } from "@/components/feedback/status-badge";
@@ -11,7 +12,20 @@ import { cn } from "@/lib/utils";
 
 export default async function HorariosPage() {
   await requirePermission(PERMISSIONS.scheduleRead);
-  const schedules = await getCompanySchedules();
+
+  let schedules;
+  try {
+    schedules = await getCompanySchedules();
+  } catch {
+    return (
+      <div className="flex flex-col gap-6 animate-fade-in">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">Horários</h2>
+        </div>
+        <CompanyBlocked />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6 animate-fade-in">

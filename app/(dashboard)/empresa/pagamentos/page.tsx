@@ -1,3 +1,4 @@
+import { CompanyBlocked } from "@/components/feedback/company-blocked";
 import { SimpleTable } from "@/components/tables/simple-table";
 import { StatusBadge } from "@/components/feedback/status-badge";
 import { formatCurrency, formatDateTime } from "@/lib/format";
@@ -7,7 +8,21 @@ import { requirePermission } from "@/lib/auth/session";
 
 export default async function PagamentosPage() {
   await requirePermission(PERMISSIONS.paymentReadCompany);
-  const payments = await getCompanyPayments();
+
+  let payments;
+  try {
+    payments = await getCompanyPayments();
+  } catch {
+    return (
+      <div className="flex flex-col gap-6 animate-fade-in">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">Pagamentos</h2>
+        </div>
+        <CompanyBlocked />
+      </div>
+    );
+  }
+
   const totalConfirmed = payments
     .filter((payment) => payment.status === "confirmed")
     .reduce((sum, payment) => sum + payment.amount, 0);

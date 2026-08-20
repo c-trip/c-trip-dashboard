@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { IconPlus } from "@tabler/icons-react";
 
+import { CompanyBlocked } from "@/components/feedback/company-blocked";
 import { SimpleTable } from "@/components/tables/simple-table";
 import { buttonVariants } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/format";
@@ -11,7 +12,20 @@ import { cn } from "@/lib/utils";
 
 export default async function RotasPage() {
   await requirePermission(PERMISSIONS.routeRead);
-  const routes = await getCompanyRoutes();
+
+  let routes;
+  try {
+    routes = await getCompanyRoutes();
+  } catch {
+    return (
+      <div className="flex flex-col gap-6 animate-fade-in">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">Rotas</h2>
+        </div>
+        <CompanyBlocked />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6 animate-fade-in">

@@ -1,4 +1,5 @@
 import { BusRowActions } from "./bus-row-actions";
+import { CompanyBlocked } from "@/components/feedback/company-blocked";
 import { SimpleTable } from "@/components/tables/simple-table";
 import { StatusBadge } from "@/components/feedback/status-badge";
 import { getBuses } from "@/lib/api/fleet";
@@ -7,7 +8,20 @@ import { requirePermission } from "@/lib/auth/session";
 
 export default async function AutocarrosPage() {
   await requirePermission(PERMISSIONS.busRead);
-  const buses = await getBuses();
+
+  let buses;
+  try {
+    buses = await getBuses();
+  } catch {
+    return (
+      <div className="flex flex-col gap-6 animate-fade-in">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">Autocarros</h2>
+        </div>
+        <CompanyBlocked />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6 animate-fade-in">

@@ -1,4 +1,5 @@
 import { DriverRowActions } from "./driver-row-actions";
+import { CompanyBlocked } from "@/components/feedback/company-blocked";
 import { SimpleTable } from "@/components/tables/simple-table";
 import { getDrivers } from "@/lib/api/fleet";
 import { PERMISSIONS } from "@/lib/auth/permissions";
@@ -6,7 +7,20 @@ import { requirePermission } from "@/lib/auth/session";
 
 export default async function MotoristasPage() {
   await requirePermission(PERMISSIONS.driverRead);
-  const drivers = await getDrivers();
+
+  let drivers;
+  try {
+    drivers = await getDrivers();
+  } catch {
+    return (
+      <div className="flex flex-col gap-6 animate-fade-in">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">Motoristas</h2>
+        </div>
+        <CompanyBlocked />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6 animate-fade-in">

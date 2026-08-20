@@ -3,12 +3,12 @@ import { notFound } from "next/navigation";
 import { CompanyModerationActions } from "./company-moderation-actions";
 import { StatusBadge } from "@/components/feedback/status-badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { getAllCompanies } from "@/lib/api/admin";
+import { getAllCompanies, getPendingCompanies } from "@/lib/api/admin";
 
 export default async function CompanyDetailPage({ params }: PageProps<"/admin/empresas/[companyId]">) {
   const { companyId } = await params;
-  const companies = await getAllCompanies();
-  const company = companies.find((c) => c.id === companyId);
+  const [allCompanies, pendingCompanies] = await Promise.all([getAllCompanies(), getPendingCompanies()]);
+  const company = [...pendingCompanies, ...allCompanies].find((c) => c.id === companyId);
 
   if (!company) {
     notFound();
