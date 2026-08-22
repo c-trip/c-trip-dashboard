@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "C-Trip — Painel de Gestão",
+  title: "C-Trip | Painel de Gestão",
   description: "Plataforma de gestão de transporte rodoviário interprovincial em Angola",
 };
 
