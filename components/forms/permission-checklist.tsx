@@ -9,17 +9,11 @@ interface PermissionOption {
 }
 
 interface PermissionChecklistProps {
-  /** Nome do campo — o Server Action lê todos os valores com `formData.getAll(name)`. */
   name: string;
   options: PermissionOption[];
   defaultSelected: string[];
 }
 
-/**
- * Checkboxes agrupadas por `grupo`, para o formulário de "Definir Permissões do
- * Colaborador". Cada gravação SUBSTITUI a lista inteira — por isso não há estado
- * "adicionar"/"remover" incremental aqui, só o conjunto final marcado.
- */
 export function PermissionChecklist({ name, options, defaultSelected }: PermissionChecklistProps) {
   const [selected, setSelected] = useState<Set<string>>(new Set(defaultSelected));
   const groups = groupBy(options, (option) => option.grupo);
@@ -37,18 +31,18 @@ export function PermissionChecklist({ name, options, defaultSelected }: Permissi
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4">
       {Array.from(selected).map((codigo) => (
         <input key={codigo} type="hidden" name={name} value={codigo} />
       ))}
       {Object.entries(groups).map(([grupo, items]) => (
-        <fieldset key={grupo} className="flex flex-col gap-2 rounded-lg border border-border p-3.5">
-          <legend className="px-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">{grupo}</legend>
+        <fieldset key={grupo} className="flex flex-col gap-3 rounded-xl border border-border p-4">
+          <legend className="px-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">{grupo}</legend>
           {items.map((item) => (
-            <label key={item.codigo} className="flex items-start gap-2.5 text-sm">
+            <label key={item.codigo} className="flex items-start gap-3 text-sm transition-colors duration-150 hover:text-foreground cursor-pointer">
               <input
                 type="checkbox"
-                className="mt-0.5 size-3.5 shrink-0 rounded border-input"
+                className="mt-0.5 size-4 shrink-0 rounded border-input"
                 checked={selected.has(item.codigo)}
                 onChange={() => toggle(item.codigo)}
               />

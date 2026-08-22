@@ -1,6 +1,3 @@
-// Importa de errors.ts, não de client.ts: client.ts é `server-only`, e este
-// ficheiro é importado por Client Components só para ler o tipo `ActionState`
-// (ex.: create-route-form.tsx) — nunca pode arrastar `next/headers` para o browser.
 import { ApiError } from "@/lib/api/errors";
 
 export interface ActionState {
@@ -11,15 +8,6 @@ export interface ActionState {
 
 export const initialActionState: ActionState = {};
 
-/**
- * Converte qualquer erro apanhado num Server Action para o formato que
- * `<FormField>`/`<FormError>` sabem ler — nunca o corpo bruto da API.
- *
- * Redirects do Next.js (`redirect()`) são implementados internamente como um
- * `throw` com `digest` a começar por "NEXT_REDIRECT"; se os apanhássemos aqui
- * como um erro normal, o redirect nunca aconteceria. Por isso são sempre
- * relançados, nunca convertidos em `formError`.
- */
 export function actionErrorState(error: unknown): ActionState {
   if (isNextRedirectError(error)) {
     throw error;

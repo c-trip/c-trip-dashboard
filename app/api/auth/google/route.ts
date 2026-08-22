@@ -5,9 +5,6 @@ import { loginWithGoogle } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/client";
 import { SESSION_COOKIE } from "@/lib/auth/constants";
 
-// Recebe o id_token que o SDK do Google devolveu no cliente e troca-o pelo
-// JWT do C-Trip — o backend nunca vê a password do Google, e o browser nunca
-// vê o JWT do C-Trip.
 export async function POST(request: Request) {
   const { id_token: idToken } = await request.json();
 

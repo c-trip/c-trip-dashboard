@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { IconPackage } from "@tabler/icons-react";
 
 import { cn } from "@/lib/utils";
 
@@ -13,13 +14,20 @@ export function EmptyState({ title, description, action, className }: EmptyState
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border px-6 py-14 text-center",
+        "flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-border bg-muted/20 px-6 py-16 text-center",
         className
       )}
     >
-      <p className="text-sm font-medium text-foreground">{title}</p>
-      {description ? <p className="max-w-sm text-sm text-muted-foreground">{description}</p> : null}
-      {action ? <div className="mt-3">{action}</div> : null}
+      <div className="flex size-14 items-center justify-center rounded-2xl bg-muted/60">
+        <IconPackage size={28} className="text-muted-foreground/60" />
+      </div>
+      <div className="flex flex-col gap-1">
+        <p className="text-sm font-semibold text-foreground">{title}</p>
+        {description ? (
+          <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">{description}</p>
+        ) : null}
+      </div>
+      {action ? <div className="mt-1">{action}</div> : null}
     </div>
   );
 }

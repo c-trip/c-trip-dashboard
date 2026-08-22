@@ -1,0 +1,2952 @@
+Administrator
+
+
+GET
+/admin/companies/pending
+[ADMIN] Empresas pendentes
+
+
+
+Lista empresas aguardando aprovação.
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[
+  {
+    "id": "string",
+    "name": "string",
+    "email": "string",
+    "phone": "string",
+    "nif": "string",
+    "responsible_name": "string",
+    "status": "string"
+  }
+]
+No links
+401	
+Não autenticado
+
+No links
+403	
+Não é ADMIN
+
+No links
+
+POST
+/admin/companies/actions/approve
+[ADMIN] Aprovar empresa
+
+
+
+Muda status para verified e regista evento no audit log.
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "company_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+}
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "status": "string"
+}
+No links
+401	
+Não autenticado
+
+No links
+403	
+Não é ADMIN
+
+No links
+404	
+Empresa não encontrada
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+POST
+/admin/companies/actions/reject
+[ADMIN] Rejeitar empresa
+
+
+
+Muda status para rejected e regista evento no audit log.
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "company_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+}
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "status": "string"
+}
+No links
+401	
+Não autenticado
+
+No links
+403	
+Não é ADMIN
+
+No links
+404	
+Empresa não encontrada
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+POST
+/admin/companies/actions/suspend
+[ADMIN] Suspender empresa
+
+
+
+Muda status para suspended e regista evento no audit log.
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "company_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+}
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "status": "string"
+}
+No links
+401	
+Não autenticado
+
+No links
+403	
+Não é ADMIN
+
+No links
+404	
+Empresa não encontrada
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+GET
+/admin/payments
+[ADMIN] Listar todos os pagamentos
+
+
+
+Pagamentos ordenados do mais recente, com paginação (limit/offset).
+
+Parameters
+Try it out
+Name	Description
+limit
+integer
+(query)
+Default value : 100
+
+100
+offset
+integer
+(query)
+Default value : 0
+
+0
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[
+  {
+    "payment_id": "string",
+    "booking_id": "string",
+    "amount": 0,
+    "method": "string",
+    "status": "string",
+    "created_at": "string"
+  }
+]
+No links
+401	
+Não autenticado
+
+No links
+403	
+Não é ADMIN
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+GET
+/admin/companies
+[ADMIN] Listar todas as empresas
+
+
+
+Lista todas as empresas independentemente do status.
+
+Parameters
+Try it out
+Name	Description
+status
+string
+(query)
+status
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[
+  {
+    "id": "string",
+    "name": "string",
+    "email": "string",
+    "status": "string",
+    "company_type": "string",
+    "created_at": "string"
+  }
+]
+No links
+401	
+Não autenticado
+
+No links
+403	
+Não é ADMIN
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+GET
+/admin/users
+[ADMIN] Listar todos os utilizadores
+
+
+
+Lista todos os utilizadores da plataforma com paginação.
+
+Parameters
+Try it out
+Name	Description
+limit
+integer
+(query)
+Default value : 100
+
+100
+offset
+integer
+(query)
+Default value : 0
+
+0
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[
+  {
+    "id": "string",
+    "email": "string",
+    "name": "string",
+    "role": "string",
+    "is_active": true,
+    "created_at": "string"
+  }
+]
+No links
+401	
+Não autenticado
+
+No links
+403	
+Não é ADMIN
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+GET
+/admin/audit-log
+[ADMIN] Audit log
+
+
+
+Últimos 50 eventos de auditoria (aprovações, rejeições, suspensões).
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[
+  {
+    "id": "string",
+    "event_type": "string",
+    "actor_id": "string",
+    "description": "string",
+    "occurred_at": "string"
+  }
+]
+No links
+401	
+Não autenticado
+
+No links
+403	
+Não é ADMIN
+
+No links
+
+GET
+/admin/permissions
+[ADMIN] Listar catálogo de permissões
+
+
+
+Lista todas as permissões disponíveis no sistema.
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[
+  {
+    "id": "string",
+    "codigo": "string",
+    "descricao": "string",
+    "grupo": "string",
+    "is_system": true
+  }
+]
+No links
+
+GET
+/admin/roles
+[ADMIN] Listar roles
+
+
+
+Lista todas as roles globais (incluindo de sistema).
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[
+  {
+    "id": "string",
+    "nome": "string",
+    "descricao": "string",
+    "empresa_id": "string",
+    "is_system": true,
+    "permission_count": 0
+  }
+]
+No links
+
+POST
+/admin/roles
+[ADMIN] Criar role global
+
+
+
+Cria uma nova role com permissões específicas.
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "nome": "string",
+  "descricao": "string",
+  "permission_ids": []
+}
+Responses
+Code	Description	Links
+201	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "nome": "string",
+  "descricao": "string",
+  "empresa_id": "string",
+  "is_system": true,
+  "permissions": [
+    {
+      "id": "string",
+      "codigo": "string",
+      "descricao": "string",
+      "grupo": "string",
+      "is_system": true
+    }
+  ]
+}
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+GET
+/admin/roles/{role_id}
+[ADMIN] Detalhes da role
+
+
+
+Retorna a role com a lista de permissões associadas.
+
+Parameters
+Try it out
+Name	Description
+role_id *
+string($uuid)
+(path)
+role_id
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "nome": "string",
+  "descricao": "string",
+  "empresa_id": "string",
+  "is_system": true,
+  "permissions": [
+    {
+      "id": "string",
+      "codigo": "string",
+      "descricao": "string",
+      "grupo": "string",
+      "is_system": true
+    }
+  ]
+}
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+DELETE
+/admin/roles/{role_id}
+[ADMIN] Apagar role
+
+
+
+Remove uma role global (não pode apagar roles de sistema).
+
+Parameters
+Try it out
+Name	Description
+role_id *
+string($uuid)
+(path)
+role_id
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+"string"
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+PATCH
+/admin/roles/{role_id}/permissions
+[ADMIN] Actualizar permissões da role
+
+
+
+Substitui completamente as permissões associadas a uma role.
+
+Parameters
+Try it out
+Name	Description
+role_id *
+string($uuid)
+(path)
+role_id
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "permission_ids": [
+    "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+  ]
+}
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "nome": "string",
+  "descricao": "string",
+  "empresa_id": "string",
+  "is_system": true,
+  "permissions": [
+    {
+      "id": "string",
+      "codigo": "string",
+      "descricao": "string",
+      "grupo": "string",
+      "is_system": true
+    }
+  ]
+}
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+POST
+/admin/roles/assign
+[ADMIN] Atribuir role a utilizador
+
+
+
+Associa uma role global a um utilizador.
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "role_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+}
+Responses
+Code	Description	Links
+201	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+"string"
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+DELETE
+/admin/roles/{role_id}/users/{user_id}
+[ADMIN] Remover role de utilizador
+
+
+
+Desassocia uma role de um utilizador.
+
+Parameters
+Try it out
+Name	Description
+role_id *
+string($uuid)
+(path)
+role_id
+user_id *
+string($uuid)
+(path)
+user_id
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+"string"
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+GET
+/admin/users/{user_id}/roles
+[ADMIN] Ver roles de um utilizador
+
+
+
+Lista todas as roles atribuídas a um utilizador.
+
+Parameters
+Try it out
+Name	Description
+user_id *
+string($uuid)
+(path)
+user_id
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "user_id": "string",
+  "user_name": "string",
+  "user_email": "string",
+  "roles": [
+    {
+      "id": "string",
+      "nome": "string",
+      "descricao": "string",
+      "empresa_id": "string",
+      "is_system": true,
+      "permission_count": 0
+    }
+  ]
+}
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+GET
+/admin/me/permissions
+Ver minhas permissões
+
+
+
+Retorna a lista de permissões do utilizador autenticado.
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "user_id": "string",
+  "permissions": [
+    "string"
+  ]
+}
+No links
+
+POST
+/payments/actions/confirm
+Confirmar pagamento
+
+
+
+Muda status do pagamento para confirmed. Restrito a ADMIN — em produção será substituído por um webhook do gateway de pagamento (Multicaixa Express).
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "payment_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+}
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "payment_id": "string",
+  "status": "string"
+}
+No links
+401	
+Não autenticado
+
+No links
+403	
+Perfil sem permissão
+
+No links
+404	
+Pagamento não encontrado
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+GET
+/companies/pending
+[ADMIN] Listar empresas pendentes
+
+
+
+Apenas ADMIN. Empresas com status=pending aguardando aprovação.
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[
+  {
+    "id": "string",
+    "name": "string",
+    "email": "string",
+    "phone": "string",
+    "nif": "string",
+    "responsible_name": "string",
+    "status": "string"
+  }
+]
+No links
+401	
+Não autenticado
+
+No links
+403	
+Não é ADMIN
+
+No links
+
+
+Company Admin
+
+
+GET
+/companies/users
+[COMPANY_ADMIN] Listar colaboradores
+
+
+
+Lista utilizadores da mesma empresa.
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[
+  {
+    "id": "string",
+    "email": "string",
+    "name": "string",
+    "role": "string",
+    "is_active": true
+  }
+]
+No links
+401	
+Não autenticado
+
+No links
+403	
+Não é COMPANY_ADMIN
+
+No links
+
+POST
+/companies/users
+[COMPANY_ADMIN] Criar colaborador
+
+
+
+Cria utilizador na empresa, sem nenhum acesso atribuído. Para dar acesso, depois de criar:
+
+POST /companies/users/{user_id}/permissions — atribui permissões soltas directamente, ou
+POST /companies/roles/assign — atribui uma role já existente (de sistema ou custom da empresa).
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "email": "user@example.com",
+  "name": "string",
+  "password": "string"
+}
+Responses
+Code	Description	Links
+201	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "email": "string",
+  "name": "string",
+  "role": "string",
+  "is_active": true
+}
+No links
+400	
+Email já registado
+
+No links
+401	
+Não autenticado
+
+No links
+403	
+Não é COMPANY_ADMIN
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+PATCH
+/companies/profile
+[COMPANY_ADMIN] Actualizar perfil da empresa
+
+
+
+Actualiza dados da empresa do utilizador autenticado.
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "name": "string",
+  "email": "string",
+  "phone": "string",
+  "address": "string"
+}
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "name": "string",
+  "email": "string",
+  "phone": "string",
+  "address": "string"
+}
+No links
+401	
+Não autenticado
+
+No links
+403	
+Não é COMPANY_ADMIN
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+DELETE
+/companies/users/{user_id}
+[COMPANY_ADMIN] Desactivar colaborador
+
+
+
+Desactiva a conta de um colaborador da empresa (is_active=False).
+
+Parameters
+Try it out
+Name	Description
+user_id *
+string($uuid)
+(path)
+user_id
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+"string"
+No links
+401	
+Não autenticado
+
+No links
+403	
+Não é COMPANY_ADMIN ou utilizador de outra empresa
+
+No links
+404	
+Utilizador não encontrado
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+GET
+/companies/permissions
+[GESTOR] Listar permissões atribuíveis pela empresa
+
+
+
+Catálogo de permissões que o gestor pode usar em permission_codes no POST /companies/users/{user_id}/permissions — já filtrado sem as permissões de plataforma (grupo admin e afins).
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[
+  {
+    "id": "string",
+    "codigo": "string",
+    "descricao": "string",
+    "grupo": "string",
+    "is_system": true
+  }
+]
+No links
+
+POST
+/companies/users/{user_id}/permissions
+[GESTOR] Definir permissões do colaborador
+
+
+
+Cria (ou actualiza) a role custom de acesso do colaborador com exactamente estas permissões — chamar de novo com uma lista diferente substitui a anterior. Não pode incluir permissões de plataforma.
+
+Parameters
+Try it out
+Name	Description
+user_id *
+string($uuid)
+(path)
+user_id
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "permission_codes": [
+    "string"
+  ]
+}
+Responses
+Code	Description	Links
+201	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "nome": "string",
+  "descricao": "string",
+  "empresa_id": "string",
+  "is_system": true,
+  "permissions": [
+    {
+      "id": "string",
+      "codigo": "string",
+      "descricao": "string",
+      "grupo": "string",
+      "is_system": true
+    }
+  ]
+}
+No links
+400	
+Permissões inexistentes ou de plataforma
+
+No links
+404	
+Colaborador não encontrado na empresa
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+GET
+/companies/roles
+[GESTOR] Listar roles da empresa
+
+
+
+Lista todas as roles da empresa (incluindo de sistema atribuíveis).
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[
+  {
+    "id": "string",
+    "nome": "string",
+    "descricao": "string",
+    "empresa_id": "string",
+    "is_system": true,
+    "permission_count": 0
+  }
+]
+No links
+
+POST
+/companies/roles/assign
+[GESTOR] Atribuir role a colaborador
+
+
+
+Atribui uma role da empresa a um utilizador da mesma empresa.
+
+Parameters
+Try it out
+Name	Description
+user_id
+string($uuid)
+(query)
+user_id
+role_id
+string($uuid)
+(query)
+role_id
+Responses
+Code	Description	Links
+201	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+"string"
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+DELETE
+/companies/roles/{role_id}/users/{user_id}
+[GESTOR] Remover role de colaborador
+
+
+
+Remove uma role de um utilizador da empresa.
+
+Parameters
+Try it out
+Name	Description
+role_id *
+string($uuid)
+(path)
+role_id
+user_id *
+string($uuid)
+(path)
+user_id
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+"string"
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+GET
+/companies/users/{user_id}/roles
+[GESTOR] Ver roles de um colaborador
+
+
+
+Lista roles atribuídas a um utilizador da empresa.
+
+Parameters
+Try it out
+Name	Description
+user_id *
+string($uuid)
+(path)
+user_id
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "user_id": "string",
+  "user_name": "string",
+  "user_email": "string",
+  "roles": [
+    {
+      "id": "string",
+      "nome": "string",
+      "descricao": "string",
+      "empresa_id": "string",
+      "is_system": true,
+      "permission_count": 0
+    }
+  ]
+}
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+GET
+/fleet/buses
+[GESTOR] Listar autocarros
+
+
+
+Lista autocarros da mesma empresa.
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[
+  {
+    "id": "string",
+    "model": "string",
+    "plate": "string",
+    "seats": 0,
+    "status": "string"
+  }
+]
+No links
+401	
+Não autenticado
+
+No links
+403	
+Perfil sem permissão
+
+No links
+
+POST
+/fleet/buses
+[GESTOR] Adicionar autocarro
+
+
+
+Regista novo autocarro na empresa. Lugares totais = total_rows × seats_per_row.
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "model": "string",
+  "license_plate": "string",
+  "total_rows": 1,
+  "seats_per_row": 1
+}
+Responses
+Code	Description	Links
+201	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "model": "string",
+  "license_plate": "string",
+  "total_seats": 0
+}
+No links
+401	
+Não autenticado
+
+No links
+403	
+Perfil sem permissão
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+GET
+/fleet/drivers
+[GESTOR] Listar motoristas
+
+
+
+Lista motoristas da mesma empresa.
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[
+  {
+    "id": "string",
+    "name": "string",
+    "phone": "string",
+    "available": true
+  }
+]
+No links
+401	
+Não autenticado
+
+No links
+403	
+Perfil sem permissão
+
+No links
+
+POST
+/fleet/drivers
+[GESTOR] Adicionar motorista
+
+
+
+Associa motorista a um user existente na empresa.
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "name": "string",
+  "phone": "string"
+}
+Responses
+Code	Description	Links
+201	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "name": "string",
+  "user_id": "string"
+}
+No links
+401	
+Não autenticado
+
+No links
+403	
+Perfil sem permissão
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+GET
+/fleet/tasks
+Listar minhas tarefas
+
+
+
+Tarefas atribuídas ao utilizador autenticado, ordenadas do mais recente.
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[
+  {
+    "id": "string",
+    "title": "string",
+    "status": "string"
+  }
+]
+No links
+401	
+Não autenticado
+
+No links
+
+POST
+/fleet/tasks
+[GESTOR] Criar tarefa
+
+
+
+Cria tarefa atribuída a um utilizador da empresa.
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "assigned_to": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "title": "string",
+  "description": "string"
+}
+Responses
+Code	Description	Links
+201	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "title": "string",
+  "status": "string"
+}
+No links
+401	
+Não autenticado
+
+No links
+403	
+Perfil sem permissão
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+PATCH
+/fleet/tasks/{task_id}
+Actualizar status de tarefa
+
+
+
+Muda o status de uma tarefa atribuída ao utilizador autenticado.
+
+Parameters
+Try it out
+Name	Description
+task_id *
+string($uuid)
+(path)
+task_id
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "status": "pending"
+}
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+"string"
+No links
+401	
+Não autenticado
+
+No links
+403	
+Tarefa não pertence ao utilizador
+
+No links
+404	
+Tarefa não encontrada
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+PATCH
+/fleet/buses/{bus_id}
+[GESTOR] Actualizar autocarro
+
+
+
+Actualiza modelo, matrícula ou status de um autocarro da empresa.
+
+Parameters
+Try it out
+Name	Description
+bus_id *
+string($uuid)
+(path)
+bus_id
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "model": "string",
+  "license_plate": "string",
+  "status": "active"
+}
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+"string"
+No links
+401	
+Não autenticado
+
+No links
+403	
+Perfil sem permissão
+
+No links
+404	
+Autocarro não encontrado
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+PATCH
+/fleet/drivers/{driver_id}
+[GESTOR] Actualizar motorista
+
+
+
+Actualiza nome, telefone ou disponibilidade de um motorista da empresa.
+
+Parameters
+Try it out
+Name	Description
+driver_id *
+string($uuid)
+(path)
+driver_id
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "name": "string",
+  "phone": "string",
+  "is_available": true
+}
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+"string"
+No links
+401	
+Não autenticado
+
+No links
+403	
+Perfil sem permissão
+
+No links
+404	
+Motorista não encontrado
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+POST
+/routes/
+[GESTOR] Criar rota
+
+
+
+Cria rota com origem, destino e preço base. Cria automaticamente a 1ª paragem (destino).
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "origin_city_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "destination_city_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "price": 1
+}
+Responses
+Code	Description	Links
+201	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "price": 0
+}
+No links
+401	
+Não autenticado
+
+No links
+403	
+Perfil sem permissão
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+GET
+/routes/company
+[GESTOR] Listar rotas da empresa
+
+
+
+Lista todas as rotas da empresa (activas e inactivas).
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[
+  {
+    "id": "string",
+    "company_name": "string",
+    "origin_city": "string",
+    "origin_province": "string",
+    "destination_city": "string",
+    "destination_province": "string",
+    "is_active": true,
+    "total_price": 0,
+    "stops": [
+      {
+        "city": "string",
+        "price": 0
+      }
+    ]
+  }
+]
+No links
+401	
+Não autenticado
+
+No links
+403	
+Perfil sem permissão
+
+No links
+
+POST
+/routes/stops
+[GESTOR] Adicionar paragem
+
+
+
+Adiciona paragem intermédia a uma rota existente.
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "route_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "city_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "price": 1
+}
+Responses
+Code	Description	Links
+201	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "order": 0,
+  "price": 0
+}
+No links
+401	
+Não autenticado
+
+No links
+403	
+Perfil sem permissão
+
+No links
+404	
+Rota não encontrada
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+PATCH
+/routes/{route_id}/activate
+[GESTOR] Reactivar rota
+
+
+
+Marca rota como activa (is_active=True).
+
+Parameters
+Try it out
+Name	Description
+route_id *
+string($uuid)
+(path)
+route_id
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "is_active": true
+}
+No links
+401	
+Não autenticado
+
+No links
+403	
+Perfil sem permissão
+
+No links
+404	
+Rota não encontrada
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+PATCH
+/routes/{route_id}/deactivate
+[GESTOR] Desactivar rota
+
+
+
+Marca rota como inactiva (is_active=False).
+
+Parameters
+Try it out
+Name	Description
+route_id *
+string($uuid)
+(path)
+route_id
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "is_active": true
+}
+No links
+401	
+Não autenticado
+
+No links
+403	
+Perfil sem permissão
+
+No links
+404	
+Rota não encontrada
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+GET
+/schedules/company
+[GESTOR] Viagens da empresa
+
+
+
+Lista todas as viagens da empresa do gestor autenticado.
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+[
+  {
+    "schedule_id": "string",
+    "route_id": "string",
+    "origin": "string",
+    "destination": "string",
+    "departure_date": "string",
+    "departure_time": "string",
+    "status": "string",
+    "total_seats": 0,
+    "available_seats": 0
+  }
+]
+No links
+401	
+Não autenticado
+
+No links
+403	
+Perfil sem permissão
+
+No links
+
+POST
+/schedules/
+[GESTOR] Criar viagem
+
+
+
+Cria horário/viagem associando rota, autocarro e motorista.
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "route_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "bus_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "driver_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "departure_date": "string",
+  "departure_time": "string",
+  "total_seats": 1,
+  "boarding_cutoff_minutes": 30
+}
+Responses
+Code	Description	Links
+201	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "route_id": "string",
+  "departure_date": "string",
+  "departure_time": "string",
+  "status": "string",
+  "boarding_cutoff_minutes": 0
+}
+No links
+401	
+Não autenticado
+
+No links
+403	
+Perfil sem permissão
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+PATCH
+/schedules/{schedule_id}
+[GESTOR] Actualizar viagem
+
+
+
+Altera campos da viagem (apenas os fornecidos).
+
+Parameters
+Try it out
+Name	Description
+schedule_id *
+string($uuid)
+(path)
+schedule_id
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "bus_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "driver_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "departure_date": "string",
+  "departure_time": "string",
+  "total_seats": 1,
+  "boarding_cutoff_minutes": 0
+}
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "route_id": "string",
+  "departure_date": "string",
+  "departure_time": "string",
+  "status": "string",
+  "total_seats": 0,
+  "boarding_cutoff_minutes": 0
+}
+No links
+401	
+Não autenticado
+
+No links
+403	
+Perfil sem permissão
+
+No links
+404	
+Viagem não encontrada
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}
+No links
+
+POST
+/schedules/actions/cancel
+[GESTOR] Cancelar viagem
+
+
+
+Muda status da viagem para cancelled.
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "schedule_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+}
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "status": "string"
+}
+No links
+401	
+Não autenticado
+
+No links
+403	
+Perfil sem permissão
+
+No links
+404	
+Viagem não encontrada
+
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string",
+      "input": "string",
+      "ctx": {}
+    }
+  ]
+}

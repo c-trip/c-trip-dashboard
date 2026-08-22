@@ -2,10 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import { parseApiError } from "./errors";
 
-// A API C-Trip devolve dois formatos de erro diferentes — ver
-// Docs/C-Trip_Guia_Frontend.pdf, Referência Rápida #6. Este teste é a garantia
-// de que `parseApiError` normaliza os dois para a mesma forma, sempre.
-
 function jsonResponse(status: number, body: unknown) {
   return new Response(JSON.stringify(body), { status });
 }

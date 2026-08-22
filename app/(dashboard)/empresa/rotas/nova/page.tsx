@@ -8,10 +8,10 @@ export default async function NovaRotaPage() {
   const cities = await getCities();
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-md flex-col gap-6 animate-fade-in">
       <div>
-        <h2 className="text-lg font-semibold text-foreground">Nova rota</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="text-xl font-bold tracking-tight text-foreground">Nova rota</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
           Origem, destino e preço base — paragens intermédias adicionam-se depois de a rota existir.
         </p>
       </div>

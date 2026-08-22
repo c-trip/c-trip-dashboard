@@ -17,19 +17,23 @@ export default async function EmpresasPage({ searchParams }: PageProps<"/admin/e
     tab === "pending" ? await getPendingCompanies() : await getAllCompanies();
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6 animate-fade-in">
       <div>
-        <h2 className="text-lg font-semibold text-foreground">Empresas</h2>
-        <p className="text-sm text-muted-foreground">Aprovação e supervisão das transportadoras registadas.</p>
+        <h2 className="text-xl font-bold tracking-tight text-foreground">Empresas</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Aprovação e supervisão das transportadoras registadas.
+        </p>
       </div>
-      <div className="flex gap-1.5">
+      <div className="flex gap-1 rounded-lg bg-muted/60 p-1 w-fit">
         {TABS.map((item) => (
           <Link
             key={item.key}
             href={`/admin/empresas?tab=${item.key}`}
             className={cn(
-              "rounded-lg px-3 py-1.5 text-sm font-medium",
-              tab === item.key ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
+              "rounded-md px-4 py-1.5 text-sm font-medium transition-all duration-200",
+              tab === item.key
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
             {item.label}
@@ -44,7 +48,7 @@ export default async function EmpresasPage({ searchParams }: PageProps<"/admin/e
           {
             header: "Nome",
             cell: (c) => (
-              <Link href={`/admin/empresas/${c.id}`} className="font-medium hover:underline">
+              <Link href={`/admin/empresas/${c.id}`} className="font-medium text-primary hover:underline">
                 {c.name}
               </Link>
             ),

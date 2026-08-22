@@ -3,10 +3,6 @@ import type { ReactNode } from "react";
 import { EmptyState } from "@/components/feedback/empty-state";
 import { cn } from "@/lib/utils";
 
-// Versão leve da <DataTable> (TanStack Table) prevista no roadmap da arquitectura.
-// Sem paginação por total de registos de propósito — a API não devolve contagem
-// total em nenhuma listagem (ver Docs/ARQUITETURA_FRONTEND.md, secção 6).
-
 export interface SimpleTableColumn<T> {
   header: string;
   cell: (row: T) => ReactNode;
@@ -27,20 +23,32 @@ export function SimpleTable<T>({ columns, rows, rowKey, emptyTitle, emptyDescrip
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-border">
+    <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-border bg-muted/50 text-left">
+          <tr className="border-b border-border bg-muted/70">
             {columns.map((column) => (
-              <th key={column.header} className={cn("px-5 py-3.5 font-medium text-muted-foreground", column.className)}>
+              <th
+                key={column.header}
+                className={cn(
+                  "px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground",
+                  column.className
+                )}
+              >
                 {column.header}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {rows.map((row) => (
-            <tr key={rowKey(row)} className="border-b border-border last:border-0 hover:bg-muted/30">
+          {rows.map((row, index) => (
+            <tr
+              key={rowKey(row)}
+              className={cn(
+                "border-b border-border/60 transition-colors duration-150 last:border-0 hover:bg-muted/40",
+                index % 2 === 1 && "bg-muted/20"
+              )}
+            >
               {columns.map((column) => (
                 <td key={column.header} className={cn("px-5 py-3.5", column.className)}>
                   {column.cell(row)}

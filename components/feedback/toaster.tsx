@@ -2,10 +2,6 @@
 
 import { Toaster as HotToaster } from "react-hot-toast";
 
-/**
- * Configuração global dos toasts com o tema do shadcn.
- * Cada toast mostra apenas uma mensagem simples — sem campo de descrição.
- */
 export function Toaster() {
   return (
     <HotToaster

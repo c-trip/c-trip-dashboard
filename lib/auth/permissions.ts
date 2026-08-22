@@ -1,9 +1,3 @@
-// Os códigos de permissão são definidos em runtime pelo backend
-// (GET /companies/permissions para o Gestor, GET /admin/permissions para o Admin),
-// por isso este ficheiro não é um enum fechado — é só a lista dos códigos que a
-// navegação e os guards deste dashboard referenciam directamente. Mantém-na
-// alinhada com `config/nav.ts` e com os `requirePermission(...)` de cada página.
-
 export const PERMISSIONS = {
   companyUpdateProfile: "company:update_profile",
   companyReadUsers: "company:read_users",

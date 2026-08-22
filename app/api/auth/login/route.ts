@@ -5,8 +5,6 @@ import { login } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/client";
 import { SESSION_COOKIE } from "@/lib/auth/constants";
 
-// Único sítio da app que fala com POST /auth/login. Devolve o JWT ao Next.js
-// server, nunca ao browser — é gravado aqui num cookie httpOnly.
 export async function POST(request: Request) {
   const { email, password } = await request.json();
 

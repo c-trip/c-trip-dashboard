@@ -17,13 +17,27 @@ type ApiFetchOptions = Omit<RequestInit, "body"> & {
   auth?: boolean;
 };
 
-/**
- * Cliente HTTP central para a API do C-Trip. `server-only`: nunca deve ser importado
- * por um Client Component (o token JWT nunca pode chegar ao browser em JS legível).
- *
- * Não faz `redirect()` sozinho em caso de 401 — quem decide o que fazer com uma sessão
- * inválida é a camada de autorização (`lib/auth/session.ts`), não este utilitário genérico.
- */
+const NETWORK_RETRY_ATTEMPTS = 2;
+const NETWORK_RETRY_DELAY_MS = 200;
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchWithNetworkRetry(url: string, init: RequestInit, retryable: boolean): Promise<Response> {
+  const attempts = retryable ? NETWORK_RETRY_ATTEMPTS : 1;
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      return await fetch(url, init);
+    } catch (error) {
+      if (attempt === attempts) throw error;
+      await sleep(NETWORK_RETRY_DELAY_MS);
+    }
+  }
+
+  throw new Error("unreachable");
+}
+
 export async function apiFetch<T = void>(path: string, options: ApiFetchOptions = {}): Promise<T> {
   const { auth = true, body, headers, ...init } = options;
 
@@ -40,13 +54,19 @@ export async function apiFetch<T = void>(path: string, options: ApiFetchOptions 
     }
   }
 
-  const response = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers: requestHeaders,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-    // Dados privados e por-sessão — nunca guardar em cache partilhada entre utilizadores.
-    cache: "no-store",
-  });
+  const method = (init.method ?? "GET").toString().toUpperCase();
+  const isIdempotent = method === "GET" || method === "HEAD";
+
+  const response = await fetchWithNetworkRetry(
+    `${API_URL}${path}`,
+    {
+      ...init,
+      headers: requestHeaders,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+      cache: "no-store",
+    },
+    isIdempotent
+  );
 
   if (!response.ok) {
     throw await parseApiError(response);
