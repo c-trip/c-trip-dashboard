@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { Toaster } from "@/components/feedback/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "C-Trip — Painel de Gestão",
+  title: "C-Trip | Painel de Gestão",
   description: "Plataforma de gestão de transporte rodoviário interprovincial em Angola",
 };
 
@@ -26,6 +27,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="pt-AO"
+      // next-themes aplica a classe "dark" no cliente antes da hidratação —
+      // sem isto o React acusa mismatch entre o HTML do servidor e o do browser.
+      suppressHydrationWarning
       className={cn(
         "h-full",
         "antialiased",
@@ -36,8 +40,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       )}
     >
       <body className="min-h-full flex flex-col">
-        <TooltipProvider>{children}</TooltipProvider>
-        <Toaster />
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
+          <TooltipProvider>{children}</TooltipProvider>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
