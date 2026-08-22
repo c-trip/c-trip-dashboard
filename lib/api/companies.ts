@@ -95,12 +95,6 @@ export interface CollaboratorRole {
   permissions: CompanyPermission[];
 }
 
-/**
- * SUBSTITUI a lista inteira de permissões do colaborador — não é incremental.
- * Se o formulário parte de checkboxes pré-marcadas (via `getCollaboratorRoles`),
- * o array enviado aqui tem de ser a lista completa desejada, não só o que mudou.
- * Ver Docs/C-Trip_Guia_Frontend.pdf, "Definir Permissões do Colaborador".
- */
 export function replaceCollaboratorPermissions(userId: string, permissionCodes: string[]) {
   return apiFetch<CollaboratorRole>(`/companies/users/${userId}/permissions`, {
     method: "POST",
@@ -121,10 +115,6 @@ export function getCompanyRoles() {
   return apiFetch<CompanyRoleSummary[]>("/companies/roles");
 }
 
-/**
- * Gotcha do backend: ao contrário de quase todos os outros POST da API, este usa
- * QUERY STRING, não corpo JSON. Confirmado no guia de integração, secção "Empresa".
- */
 export function assignCompanyRole(userId: string, roleId: string) {
   const params = new URLSearchParams({ user_id: userId, role_id: roleId });
   return apiFetch<{ detail: string }>(`/companies/roles/assign?${params.toString()}`, { method: "POST" });

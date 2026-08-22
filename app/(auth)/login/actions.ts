@@ -38,6 +38,5 @@ export async function loginAction(_prevState: ActionState, formData: FormData): 
     return actionErrorState(error);
   }
 
-  // O formulário mostra o toast de sucesso e navega para "/" (que decide o destino pelo role).
   return { success: true };
 }

@@ -1,71 +1,55 @@
-import Link from "next/link";
-import {
-  IconRoute,
-  IconCalendar,
-  IconBus,
-  IconUsers,
-  IconUserCog,
-  IconCreditCard,
-  IconLayoutDashboard,
-} from "@tabler/icons-react";
-
-import { empresaNav } from "@/config/nav";
+import { ChartAreaInteractive } from "@/components/chart-area-interactive";
+import { DataTable } from "@/components/data-table";
+import { SectionCards, type SectionCardItem } from "@/components/section-cards";
 import { requireAuth } from "@/lib/auth/session";
 
-const NAV_ICONS_MAP: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
-  route: IconRoute,
-  calendar: IconCalendar,
-  bus: IconBus,
-  users: IconUsers,
-  userCog: IconUserCog,
-  creditCard: IconCreditCard,
-  dashboard: IconLayoutDashboard,
-};
+import data from "@/app/dashboard/data.json";
 
-const NAV_COLORS: Record<string, string> = {
-  route: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
-  calendar: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
-  bus: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-  users: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-  userCog: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
-  creditCard: "bg-teal-500/10 text-teal-600 dark:text-teal-400",
-};
+const CARDS: SectionCardItem[] = [
+  {
+    description: "Receita do mês",
+    value: "320 000 Kz",
+    trend: "up",
+    trendValue: "+12.5%",
+    footerTitle: "Em crescimento este mês",
+    footerSubtitle: "Pagamentos dos últimos 6 meses",
+  },
+  {
+    description: "Bilhetes vendidos",
+    value: "1 234",
+    trend: "down",
+    trendValue: "-20%",
+    footerTitle: "Abrandou este período",
+    footerSubtitle: "Precisa de atenção",
+  },
+  {
+    description: "Rotas activas",
+    value: "18",
+    trend: "up",
+    trendValue: "+12.5%",
+    footerTitle: "Boa cobertura",
+    footerSubtitle: "Acima da meta prevista",
+  },
+  {
+    description: "Autocarros em operação",
+    value: "12",
+    trend: "up",
+    trendValue: "+4.5%",
+    footerTitle: "Frota estável",
+    footerSubtitle: "Sem falhas reportadas",
+  },
+];
 
 export default async function EmpresaOverviewPage() {
-  const session = await requireAuth();
+  await requireAuth();
 
   return (
-    <div className="flex flex-col gap-8 animate-fade-in">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight text-balance text-foreground">
-          Olá, {session.name.split(" ")[0]}
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Ponto de partida do painel do gestor. Gere rotas, frota e pagamentos da tua empresa.
-        </p>
+    <div className="@container/main -mx-4 flex flex-1 flex-col gap-4 md:-mx-8 md:gap-6 animate-fade-in">
+      <SectionCards cards={CARDS} />
+      <div className="px-4 lg:px-6">
+        <ChartAreaInteractive />
       </div>
-
-      <div>
-        <h3 className="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wider">Secções</h3>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {empresaNav.slice(1).map((item) => {
-            const Icon = NAV_ICONS_MAP[item.icon];
-            const colorClass = NAV_COLORS[item.icon] ?? "bg-muted text-muted-foreground";
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="group flex items-center gap-4 rounded-xl border border-border bg-card p-4 shadow-xs transition-all duration-200 hover:shadow-md hover:border-primary/20"
-              >
-                <div className={`flex size-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-110 ${colorClass}`}>
-                  {Icon ? <Icon size={20} /> : null}
-                </div>
-                <span className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors duration-200">{item.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
+      <DataTable data={data} />
     </div>
   );
 }

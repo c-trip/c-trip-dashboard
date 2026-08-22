@@ -1,12 +1,5 @@
 import { PERMISSIONS } from "@/lib/auth/permissions";
 
-// `icon` é uma chave em string, não o componente do ícone em si — este objecto
-// precisa de ser dado simples e serializável, porque atravessa a fronteira
-// Server Component (layout, que filtra por permissão) → Client Component
-// (<Sidebar>, que decide o realce activo). Componentes React não podem
-// atravessar essa fronteira como prop; strings podem. A resolução da chave
-// para o componente real do ícone acontece em config/nav-icons.ts, já do lado
-// que efectivamente renderiza.
 export type IconName =
   | "dashboard"
   | "route"

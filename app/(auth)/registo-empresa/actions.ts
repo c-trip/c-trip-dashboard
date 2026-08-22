@@ -37,7 +37,6 @@ export async function registerCompanyAction(
 
   try {
     await registerCompany(parsed.data);
-    // O registo não devolve access_token — fazer login logo a seguir (ver guia de integração).
     const { access_token: accessToken } = await login({
       email: parsed.data.email,
       password: parsed.data.password,

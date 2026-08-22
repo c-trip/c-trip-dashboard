@@ -9,7 +9,7 @@ import { SESSION_COOKIE } from "@/lib/auth/constants";
 
 /**
  * Data Access Layer da sessão. Todo o resto da app (layouts, pages, Server Actions)
- * passa por aqui para saber "quem és" e "o que podes" — nunca decide isso sozinho.
+ * passa por aqui para saber "quem és" e "o que podes", nunca decide isso sozinho.
  * `cache()` garante que, dentro do mesmo pedido, o backend só é consultado uma vez
  * mesmo que vários componentes chamem `getSession()`/`can()` em paralelo.
  */
@@ -28,8 +28,6 @@ export const getSession = cache(async (): Promise<Session | null> => {
   try {
     return await getMe();
   } catch (error) {
-    // Token de 24h sem refresh (ver Docs/C-Trip_Guia_Frontend.pdf, Referência Rápida #1):
-    // um 401 aqui significa sessão expirada/inválida, nunca um estado a repetir.
     if (error instanceof ApiError && (error.status === 401 || error.status === 404)) {
       return null;
     }
@@ -50,10 +48,6 @@ export const getPermissions = cache(async (): Promise<string[]> => {
   }
 });
 
-/**
- * `role === "admin"` é sempre bypass total, mesmo que a lista de permissões não
- * contenha o código explicitamente (ver guia de integração, "Minhas Permissões").
- */
 export async function can(code: string): Promise<boolean> {
   const session = await getSession();
   if (!session) return false;
