@@ -14,6 +14,9 @@ export default async function CompanyDetailPage({ params }: PageProps<"/admin/em
     notFound();
   }
 
+  const companyType = "company_type" in company ? company.company_type : null;
+  const createdAt = "created_at" in company ? company.created_at : null;
+
   return (
     <div className="flex max-w-lg flex-col gap-6 animate-fade-in">
       <div className="flex items-center gap-3">
@@ -26,9 +29,9 @@ export default async function CompanyDetailPage({ params }: PageProps<"/admin/em
             <dt className="font-medium text-muted-foreground">Email</dt>
             <dd>{company.email}</dd>
             <dt className="font-medium text-muted-foreground">Tipo</dt>
-            <dd>{company.company_type}</dd>
+            <dd>{companyType ?? "não encontrado"}</dd>
             <dt className="font-medium text-muted-foreground">Registada em</dt>
-            <dd>{new Date(company.created_at).toLocaleDateString("pt-AO")}</dd>
+            <dd>{createdAt ? new Date(createdAt).toLocaleDateString("pt-AO") : "não encontrado"}</dd>
           </dl>
         </CardContent>
       </Card>
