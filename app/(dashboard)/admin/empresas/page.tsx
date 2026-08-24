@@ -1,18 +1,19 @@
 import Link from "next/link";
 
+import { CompanyRowActions } from "./company-row-actions";
 import { SimpleTable } from "@/components/tables/simple-table";
 import { StatusBadge } from "@/components/feedback/status-badge";
 import { getAllCompanies, getPendingCompanies, type AdminCompany, type PendingCompany } from "@/lib/api/admin";
 import { cn } from "@/lib/utils";
 
 const TABS = [
-  { key: "pending", label: "Pendentes" },
   { key: "all", label: "Todas" },
+  { key: "pending", label: "Pendentes" },
 ] as const;
 
 export default async function EmpresasPage({ searchParams }: PageProps<"/admin/empresas">) {
   const params = await searchParams;
-  const tab = params?.tab === "all" ? "all" : "pending";
+  const tab = params?.tab === "pending" ? "pending" : "all";
   const companies: (PendingCompany | AdminCompany)[] =
     tab === "pending" ? await getPendingCompanies() : await getAllCompanies();
 
@@ -54,7 +55,24 @@ export default async function EmpresasPage({ searchParams }: PageProps<"/admin/e
             ),
           },
           { header: "Email", cell: (c) => c.email },
+          {
+            header: "Tipo",
+            cell: (c) => ("company_type" in c ? <span>{c.company_type}</span> : <span className="text-muted-foreground">—</span>),
+          },
+          {
+            header: "Registada em",
+            cell: (c) => (
+              <span className="tabular-nums whitespace-nowrap">
+                {"created_at" in c ? new Date(c.created_at).toLocaleDateString("pt-AO") : <span className="text-muted-foreground">—</span>}
+              </span>
+            ),
+          },
           { header: "Estado", cell: (c) => <StatusBadge domain="company" status={c.status} /> },
+          {
+            header: "",
+            cell: (c) => <CompanyRowActions companyId={c.id} companyName={c.name} status={c.status} />,
+            className: "text-right",
+          },
         ]}
       />
     </div>
