@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { ApiError, parseApiError } from "@/lib/api/errors";
 import { SESSION_COOKIE } from "@/lib/auth/constants";
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
 
 type ApiFetchOptions = Omit<RequestInit, "body"> & {
   /** Corpo do pedido — serializado como JSON automaticamente. */
@@ -24,7 +24,11 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function fetchWithNetworkRetry(url: string, init: RequestInit, retryable: boolean): Promise<Response> {
+async function fetchWithNetworkRetry(
+  url: string,
+  init: RequestInit,
+  retryable: boolean,
+): Promise<Response> {
   const attempts = retryable ? NETWORK_RETRY_ATTEMPTS : 1;
   for (let attempt = 1; attempt <= attempts; attempt++) {
     try {
@@ -38,7 +42,10 @@ async function fetchWithNetworkRetry(url: string, init: RequestInit, retryable: 
   throw new Error("unreachable");
 }
 
-export async function apiFetch<T = void>(path: string, options: ApiFetchOptions = {}): Promise<T> {
+export async function apiFetch<T = void>(
+  path: string,
+  options: ApiFetchOptions = {},
+): Promise<T> {
   const { auth = true, body, headers, ...init } = options;
 
   const requestHeaders = new Headers(headers);
@@ -65,7 +72,7 @@ export async function apiFetch<T = void>(path: string, options: ApiFetchOptions 
       body: body !== undefined ? JSON.stringify(body) : undefined,
       cache: "no-store",
     },
-    isIdempotent
+    isIdempotent,
   );
 
   if (!response.ok) {
