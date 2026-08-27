@@ -48,6 +48,10 @@ export async function apiFetch<T = void>(
 ): Promise<T> {
   const { auth = true, body, headers, ...init } = options;
 
+  console.log("API_URL =", API_URL);
+  console.log("PATH =", path);
+  console.log("FINAL URL =", `${API_URL}${path}`);
+
   const requestHeaders = new Headers(headers);
   requestHeaders.set("Accept", "application/json");
   if (body !== undefined) {
