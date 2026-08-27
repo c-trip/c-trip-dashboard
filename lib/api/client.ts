@@ -80,12 +80,17 @@ export async function apiFetch<T = void>(
   );
 
   if (!response.ok) {
+    console.log("ERROR STATUS:", response.status);
+    console.log("ERROR TEXT:", await response.text());
     throw await parseApiError(response);
   }
 
   if (response.status === 204) {
     return undefined as T;
   }
+
+  console.log("STATUS:", response.status);
+  console.log("OK:", response.ok);
 
   return (await response.json()) as T;
 }
