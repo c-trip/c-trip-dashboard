@@ -20,13 +20,22 @@ interface ValidationErrorBody {
   detail: Array<{ loc: Array<string | number>; msg: string; type: string }>;
 }
 
-export async function parseApiError(response: Response): Promise<ApiError> {
-  let body: unknown = null;
+type ErrorSource =
+  | { status: number; json: () => Promise<unknown> }
+  | { status: number; data: unknown };
+
+async function readBody(source: ErrorSource): Promise<unknown> {
+  if ("data" in source) return source.data;
   try {
-    body = await response.json();
+    return await source.json();
   } catch {
     // resposta sem corpo JSON (ex.: erro de rede antes de chegar ao FastAPI) — segue sem `body`
+    return null;
   }
+}
+
+export async function parseApiError(response: ErrorSource): Promise<ApiError> {
+  const body = await readBody(response);
 
   if (isValidationErrorBody(body)) {
     const fieldErrors: FieldErrors = {};
@@ -34,14 +43,21 @@ export async function parseApiError(response: Response): Promise<ApiError> {
       const field = String(issue.loc.at(-1) ?? "form");
       fieldErrors[field] = [...(fieldErrors[field] ?? []), issue.msg];
     }
-    return new ApiError(response.status, "Verifica os campos assinalados.", fieldErrors);
+    return new ApiError(
+      response.status,
+      "Verifica os campos assinalados.",
+      fieldErrors,
+    );
   }
 
   if (isBusinessErrorBody(body)) {
     return new ApiError(response.status, body.detail);
   }
 
-  return new ApiError(response.status, `Erro inesperado do servidor (${response.status}).`);
+  return new ApiError(
+    response.status,
+    `Erro inesperado do servidor (${response.status}).`,
+  );
 }
 
 function isBusinessErrorBody(body: unknown): body is BusinessErrorBody {
