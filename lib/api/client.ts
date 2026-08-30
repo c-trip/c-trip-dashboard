@@ -3,8 +3,7 @@ import { cookies } from "next/headers";
 
 import { ApiError, parseApiError } from "@/lib/api/errors";
 import { SESSION_COOKIE } from "@/lib/auth/constants";
-
-const API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
+import { API_URL } from "@/constants/api_base";
 
 type ApiFetchOptions = Omit<RequestInit, "body"> & {
   /** Corpo do pedido — serializado como JSON automaticamente. */
