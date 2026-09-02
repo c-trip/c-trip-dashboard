@@ -42,7 +42,7 @@ export default async function PagamentosPage() {
           href="/empresa/relatorios"
           className="text-sm text-primary hover:underline"
         >
-          Fluxo de caixa e resumo
+          Ver fluxo de caixa
         </Link>
       </div>
       <SimpleTable

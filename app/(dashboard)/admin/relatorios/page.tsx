@@ -23,10 +23,11 @@ export default async function AdminRelatoriosPage({
     <div className="flex flex-col gap-6 animate-fade-in">
       <div>
         <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Relatórios
+          Fluxo de caixa
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Fluxo de caixa e resumo financeiro global da plataforma.
+          Entradas confirmadas por dia e por mês, e o resumo financeiro global
+          da plataforma.
         </p>
       </div>
       <PaymentsFilterBar initial={filters} />

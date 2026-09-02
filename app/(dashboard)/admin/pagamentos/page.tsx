@@ -30,7 +30,7 @@ export default async function AdminPagamentosPage({
           href="/admin/relatorios"
           className="text-sm text-primary hover:underline"
         >
-          Fluxo de caixa e resumo
+          Ver fluxo de caixa
         </Link>
       </div>
       <SimpleTable

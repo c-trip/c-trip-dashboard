@@ -81,7 +81,7 @@ export const empresaNav: NavItem[] = [
   },
   {
     href: "/empresa/relatorios",
-    label: "Relatórios",
+    label: "Fluxo de caixa",
     icon: "report",
     permission: PERMISSIONS.paymentReadCompany,
   },
@@ -109,7 +109,7 @@ export const adminNav: NavItem[] = [
   },
   {
     href: "/admin/relatorios",
-    label: "Relatórios",
+    label: "Fluxo de caixa",
     icon: "report",
     permission: PERMISSIONS.paymentReadAll,
   },

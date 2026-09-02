@@ -30,7 +30,7 @@ export default async function RelatoriosPage({
       <div className="flex flex-col gap-6 animate-fade-in">
         <div>
           <h2 className="text-xl font-bold tracking-tight text-foreground">
-            Relatórios
+            Fluxo de caixa
           </h2>
         </div>
         <CompanyBlocked />
@@ -42,10 +42,11 @@ export default async function RelatoriosPage({
     <div className="flex flex-col gap-6 animate-fade-in">
       <div>
         <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Relatórios
+          Fluxo de caixa
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Fluxo de caixa e resumo financeiro das rotas da tua empresa.
+          Entradas confirmadas por dia e por mês, e o resumo financeiro das
+          rotas da tua empresa.
         </p>
       </div>
       <PaymentsFilterBar initial={filters} />
