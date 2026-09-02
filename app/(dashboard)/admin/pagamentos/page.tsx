@@ -1,50 +1,38 @@
+import Link from "next/link";
+
 import { ConfirmPaymentButton } from "./confirm-payment-button";
-import { CashFlowReport } from "@/components/dashboard/cash-flow-report";
-import { PaymentsFilterBar } from "@/components/feedback/payments-filter-bar";
-import { PaymentsSummaryCards } from "@/components/feedback/payments-summary-cards";
 import { SimpleTable } from "@/components/tables/simple-table";
 import { StatusBadge } from "@/components/feedback/status-badge";
 import { formatCurrency, formatDateTime } from "@/lib/format";
-import { getAdminPaymentsSummary, getAllPayments } from "@/lib/api/admin";
+import { getAllPayments } from "@/lib/api/admin";
 
 const LIMIT = 50;
-
-function str(value: string | string[] | undefined): string | undefined {
-  return Array.isArray(value) ? value[0] : value;
-}
 
 export default async function AdminPagamentosPage({
   searchParams,
 }: PageProps<"/admin/pagamentos">) {
   const params = await searchParams;
   const offset = Number(params?.offset ?? 0) || 0;
-  const filters = {
-    date_from: str(params?.date_from),
-    date_to: str(params?.date_to),
-    method: str(params?.method),
-  };
-  const [payments, summary] = await Promise.all([
-    getAllPayments(LIMIT, offset),
-    getAdminPaymentsSummary(filters),
-  ]);
+  const payments = await getAllPayments(LIMIT, offset);
 
   return (
     <div className="flex flex-col gap-6 animate-fade-in">
-      <div>
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Pagamentos
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Visão financeira global da plataforma.
-        </p>
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
+            Pagamentos
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Todos os pagamentos da plataforma, do mais recente.
+          </p>
+        </div>
+        <Link
+          href="/admin/relatorios"
+          className="text-sm text-primary hover:underline"
+        >
+          Fluxo de caixa e resumo
+        </Link>
       </div>
-      <PaymentsFilterBar initial={filters} />
-      <PaymentsSummaryCards summary={summary} />
-      <CashFlowReport byDay={summary.by_day} byMonth={summary.by_month} />
-      <p className="-mb-2 text-xs text-muted-foreground">
-        Os filtros acima afectam apenas o resumo. A lista abaixo mostra os
-        pagamentos mais recentes.
-      </p>
       <SimpleTable
         rows={payments}
         rowKey={(payment) => payment.payment_id}

@@ -1,4 +1,5 @@
 import {
+  IoAnalyticsOutline,
   IoBusinessOutline,
   IoBusOutline,
   IoCalendarOutline,
@@ -29,4 +30,5 @@ export const NAV_ICONS: Record<IconName, IconType> = {
   shield: IoShieldCheckmarkOutline,
   ticket: IoQrCodeOutline,
   scan: IoScanOutline,
+  report: IoAnalyticsOutline,
 };

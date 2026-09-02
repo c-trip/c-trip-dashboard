@@ -12,7 +12,8 @@ export type IconName =
   | "clipboard"
   | "shield"
   | "ticket"
-  | "scan";
+  | "scan"
+  | "report";
 
 export interface NavItem {
   href: string;
@@ -78,6 +79,12 @@ export const empresaNav: NavItem[] = [
     icon: "creditCard",
     permission: PERMISSIONS.paymentReadCompany,
   },
+  {
+    href: "/empresa/relatorios",
+    label: "Relatórios",
+    icon: "report",
+    permission: PERMISSIONS.paymentReadCompany,
+  },
 ];
 
 export const adminNav: NavItem[] = [
@@ -98,6 +105,12 @@ export const adminNav: NavItem[] = [
     href: "/admin/pagamentos",
     label: "Pagamentos",
     icon: "creditCard",
+    permission: PERMISSIONS.paymentReadAll,
+  },
+  {
+    href: "/admin/relatorios",
+    label: "Relatórios",
+    icon: "report",
     permission: PERMISSIONS.paymentReadAll,
   },
   {
