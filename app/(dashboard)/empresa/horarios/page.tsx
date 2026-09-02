@@ -7,11 +7,15 @@ import { StatusBadge } from "@/components/feedback/status-badge";
 import { buttonVariants } from "@/components/ui/button";
 import { getCompanySchedules } from "@/lib/api/schedules";
 import { PERMISSIONS } from "@/lib/auth/permissions";
-import { requirePermission } from "@/lib/auth/session";
+import { can, requirePermission } from "@/lib/auth/session";
 import { cn } from "@/lib/utils";
 
 export default async function HorariosPage() {
   await requirePermission(PERMISSIONS.scheduleRead);
+  const [canEdit, canCancel] = await Promise.all([
+    can(PERMISSIONS.scheduleUpdate),
+    can(PERMISSIONS.scheduleCancel),
+  ]);
 
   let schedules;
   try {
@@ -61,6 +65,8 @@ export default async function HorariosPage() {
                   scheduleId={s.schedule_id}
                   origin={s.origin}
                   destination={s.destination}
+                  canEdit={canEdit}
+                  canCancel={canCancel}
                 />
               ) : null,
             className: "text-right",

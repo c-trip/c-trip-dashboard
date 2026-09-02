@@ -1,17 +1,22 @@
 import Link from "next/link";
 import { IconPlus } from "@tabler/icons-react";
 
+import { RouteRowActions } from "./route-row-actions";
 import { CompanyBlocked } from "@/components/feedback/company-blocked";
 import { SimpleTable } from "@/components/tables/simple-table";
 import { buttonVariants } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/format";
 import { getCompanyRoutes } from "@/lib/api/routes";
 import { PERMISSIONS } from "@/lib/auth/permissions";
-import { requirePermission } from "@/lib/auth/session";
+import { can, requirePermission } from "@/lib/auth/session";
 import { cn } from "@/lib/utils";
 
 export default async function RotasPage() {
   await requirePermission(PERMISSIONS.routeRead);
+  const [canActivate, canDeactivate] = await Promise.all([
+    can(PERMISSIONS.routeActivate),
+    can(PERMISSIONS.routeDeactivate),
+  ]);
 
   let routes;
   try {
@@ -47,7 +52,14 @@ export default async function RotasPage() {
         emptyTitle="Ainda não há rotas"
         emptyDescription="Cria a tua primeira rota para poderes agendar horários e vender bilhetes."
         columns={[
-          { header: "Origem", cell: (r) => <span className="font-medium">{r.origin_city}</span> },
+          {
+            header: "Origem",
+            cell: (r) => (
+              <Link href={`/empresa/rotas/${r.id}`} className="font-medium text-primary hover:underline">
+                {r.origin_city}
+              </Link>
+            ),
+          },
           { header: "Destino", cell: (r) => <span className="font-medium">{r.destination_city}</span> },
           { header: "Preço base", cell: (r) => <span className="tabular-nums font-medium">{formatCurrency(r.total_price)}</span> },
           { header: "Paragens", cell: (r) => <span className="tabular-nums">{r.stops.length > 0 ? String(r.stops.length) : "—"}</span> },
@@ -58,6 +70,19 @@ export default async function RotasPage() {
                 {r.is_active ? "Activa" : "Inactiva"}
               </span>
             ),
+          },
+          {
+            header: "",
+            cell: (r) => (
+              <RouteRowActions
+                routeId={r.id}
+                routeLabel={`${r.origin_city} → ${r.destination_city}`}
+                isActive={r.is_active}
+                canActivate={canActivate}
+                canDeactivate={canDeactivate}
+              />
+            ),
+            className: "text-right",
           },
         ]}
       />

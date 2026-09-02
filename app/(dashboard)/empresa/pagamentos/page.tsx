@@ -1,8 +1,9 @@
 import { CompanyBlocked } from "@/components/feedback/company-blocked";
+import { PaymentsSummaryCards } from "@/components/feedback/payments-summary-cards";
 import { SimpleTable } from "@/components/tables/simple-table";
 import { StatusBadge } from "@/components/feedback/status-badge";
 import { formatCurrency, formatDateTime } from "@/lib/format";
-import { getCompanyPayments } from "@/lib/api/payments";
+import { getCompanyPayments, getCompanyPaymentsSummary } from "@/lib/api/payments";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { requirePermission } from "@/lib/auth/session";
 
@@ -10,8 +11,9 @@ export default async function PagamentosPage() {
   await requirePermission(PERMISSIONS.paymentReadCompany);
 
   let payments;
+  let summary;
   try {
-    payments = await getCompanyPayments();
+    [payments, summary] = await Promise.all([getCompanyPayments(), getCompanyPaymentsSummary()]);
   } catch {
     return (
       <div className="flex flex-col gap-6 animate-fade-in">
@@ -23,18 +25,15 @@ export default async function PagamentosPage() {
     );
   }
 
-  const totalConfirmed = payments
-    .filter((payment) => payment.status === "confirmed")
-    .reduce((sum, payment) => sum + payment.amount, 0);
-
   return (
     <div className="flex flex-col gap-6 animate-fade-in">
       <div>
         <h2 className="text-xl font-bold tracking-tight text-foreground">Pagamentos</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          {payments.length} pagamento(s) · {formatCurrency(totalConfirmed)} confirmados
+          Pagamentos das reservas ligadas às rotas da tua empresa.
         </p>
       </div>
+      <PaymentsSummaryCards summary={summary} />
       <SimpleTable
         rows={payments}
         rowKey={(payment) => payment.payment_id}

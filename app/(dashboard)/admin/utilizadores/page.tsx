@@ -3,6 +3,8 @@ import Link from "next/link";
 import { SimpleTable } from "@/components/tables/simple-table";
 import { buttonVariants } from "@/components/ui/button";
 import { getAllUsers } from "@/lib/api/admin";
+import { PERMISSIONS } from "@/lib/auth/permissions";
+import { can } from "@/lib/auth/session";
 import { cn } from "@/lib/utils";
 
 const LIMIT = 50;
@@ -10,7 +12,10 @@ const LIMIT = 50;
 export default async function UtilizadoresPage({ searchParams }: PageProps<"/admin/utilizadores">) {
   const params = await searchParams;
   const offset = Number(params?.offset ?? 0) || 0;
-  const users = await getAllUsers(LIMIT, offset);
+  const [users, canReadRoles] = await Promise.all([
+    getAllUsers(LIMIT, offset),
+    can(PERMISSIONS.adminRoleRead),
+  ]);
 
   return (
     <div className="flex flex-col gap-6 animate-fade-in">
@@ -36,6 +41,22 @@ export default async function UtilizadoresPage({ searchParams }: PageProps<"/adm
               </span>
             ),
           },
+          ...(canReadRoles
+            ? [
+                {
+                  header: "",
+                  cell: (u: (typeof users)[number]) => (
+                    <Link
+                      href={`/admin/utilizadores/${u.id}/roles`}
+                      className="text-primary hover:underline"
+                    >
+                      Roles
+                    </Link>
+                  ),
+                  className: "text-right",
+                },
+              ]
+            : []),
         ]}
       />
       <div className="flex items-center justify-between text-sm text-muted-foreground">

@@ -1,15 +1,19 @@
 import { ConfirmPaymentButton } from "./confirm-payment-button";
+import { PaymentsSummaryCards } from "@/components/feedback/payments-summary-cards";
 import { SimpleTable } from "@/components/tables/simple-table";
 import { StatusBadge } from "@/components/feedback/status-badge";
 import { formatCurrency, formatDateTime } from "@/lib/format";
-import { getAllPayments } from "@/lib/api/admin";
+import { getAdminPaymentsSummary, getAllPayments } from "@/lib/api/admin";
 
 const LIMIT = 50;
 
 export default async function AdminPagamentosPage({ searchParams }: PageProps<"/admin/pagamentos">) {
   const params = await searchParams;
   const offset = Number(params?.offset ?? 0) || 0;
-  const payments = await getAllPayments(LIMIT, offset);
+  const [payments, summary] = await Promise.all([
+    getAllPayments(LIMIT, offset),
+    getAdminPaymentsSummary(),
+  ]);
 
   return (
     <div className="flex flex-col gap-6 animate-fade-in">
@@ -17,6 +21,7 @@ export default async function AdminPagamentosPage({ searchParams }: PageProps<"/
         <h2 className="text-xl font-bold tracking-tight text-foreground">Pagamentos</h2>
         <p className="mt-1 text-sm text-muted-foreground">Visão financeira global da plataforma.</p>
       </div>
+      <PaymentsSummaryCards summary={summary} />
       <SimpleTable
         rows={payments}
         rowKey={(payment) => payment.payment_id}

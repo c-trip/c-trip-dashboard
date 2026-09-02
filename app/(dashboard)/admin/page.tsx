@@ -1,14 +1,16 @@
-import { ChartAreaInteractive } from "@/components/chart-area-interactive";
-import { DataTable } from "@/components/data-table";
+import { RevenueChart } from "@/components/dashboard/revenue-chart";
 import { SectionCards, type SectionCardItem } from "@/components/section-cards";
-import { getPendingCompanies } from "@/lib/api/admin";
+import { getAdminPaymentsSummary, getAllCompanies, getPendingCompanies } from "@/lib/api/admin";
+import { formatCurrency } from "@/lib/format";
 import { requireRole } from "@/lib/auth/session";
-
-import data from "@/app/dashboard/data.json";
 
 export default async function AdminOverviewPage() {
   await requireRole("admin");
-  const pending = await getPendingCompanies();
+  const [pending, summary, companies] = await Promise.all([
+    getPendingCompanies(),
+    getAdminPaymentsSummary(),
+    getAllCompanies("verified"),
+  ]);
 
   const cards: SectionCardItem[] = [
     {
@@ -19,28 +21,25 @@ export default async function AdminOverviewPage() {
       footerHref: pending.length > 0 ? "/admin/empresas?tab=pending" : undefined,
     },
     {
-      description: "Receita total",
-      value: "1 250 000 Kz",
-      trend: "up",
-      trendValue: "+12.5%",
-      footerTitle: "Em crescimento este mês",
-      footerSubtitle: "Pagamentos dos últimos 6 meses",
+      description: "Receita confirmada",
+      value: formatCurrency(summary.total_confirmed),
+      footerTitle: `${summary.count_confirmed} pagamento(s) confirmado(s)`,
+      footerSubtitle: "Total acumulado na plataforma",
+      footerHref: "/admin/pagamentos",
     },
     {
-      description: "Empresas activas",
-      value: "45",
-      trend: "up",
-      trendValue: "+4.5%",
-      footerTitle: "Retenção sólida",
-      footerSubtitle: "Acima da meta prevista",
+      description: "A aguardar confirmação",
+      value: formatCurrency(summary.total_pending),
+      footerTitle: `${summary.count_pending} pagamento(s) pendente(s)`,
+      footerSubtitle: "Confirmar manualmente se o webhook falhar",
+      footerHref: "/admin/pagamentos",
     },
     {
-      description: "Utilizadores registados",
-      value: "1 234",
-      trend: "down",
-      trendValue: "-20%",
-      footerTitle: "Abrandou este período",
-      footerSubtitle: "Aquisição precisa de atenção",
+      description: "Empresas verificadas",
+      value: String(companies.length),
+      footerTitle: "Transportadoras activas",
+      footerSubtitle: "Ver todas as empresas",
+      footerHref: "/admin/empresas",
     },
   ];
 
@@ -48,9 +47,8 @@ export default async function AdminOverviewPage() {
     <div className="@container/main -mx-4 flex flex-1 flex-col gap-4 md:-mx-8 md:gap-6 animate-fade-in">
       <SectionCards cards={cards} />
       <div className="px-4 lg:px-6">
-        <ChartAreaInteractive />
+        <RevenueChart byMonth={summary.by_month} />
       </div>
-      <DataTable data={data} />
     </div>
   );
 }

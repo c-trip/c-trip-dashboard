@@ -1,8 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
-import { replaceCollaboratorPermissions } from "@/lib/api/companies";
+import {
+  assignCompanyRole,
+  removeCompanyRole,
+  replaceCollaboratorPermissions,
+} from "@/lib/api/companies";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { requirePermission } from "@/lib/auth/session";
 import { actionErrorState, type ActionState } from "@/lib/forms/action-state";
@@ -27,4 +32,36 @@ export async function replacePermissionsAction(
 
   revalidatePath(`/empresa/colaboradores/${userId}/permissoes`);
   return { success: true };
+}
+
+const assignRoleSchema = z.object({
+  role_id: z.string().uuid({ message: "Escolhe uma role." }),
+});
+
+export async function assignCollaboratorRoleAction(
+  userId: string,
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  await requirePermission(PERMISSIONS.companyRoleAssign);
+
+  const parsed = assignRoleSchema.safeParse({ role_id: formData.get("role_id") });
+  if (!parsed.success) {
+    return { fieldErrors: parsed.error.flatten().fieldErrors };
+  }
+
+  try {
+    await assignCompanyRole(userId, parsed.data.role_id);
+  } catch (error) {
+    return actionErrorState(error);
+  }
+
+  revalidatePath(`/empresa/colaboradores/${userId}/permissoes`);
+  return { success: true };
+}
+
+export async function removeCollaboratorRoleAction(userId: string, roleId: string) {
+  await requirePermission(PERMISSIONS.companyRoleAssign);
+  await removeCompanyRole(roleId, userId);
+  revalidatePath(`/empresa/colaboradores/${userId}/permissoes`);
 }

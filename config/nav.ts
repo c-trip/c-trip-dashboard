@@ -32,6 +32,12 @@ export const empresaNav: NavItem[] = [
     permission: PERMISSIONS.driverRead,
   },
   {
+    href: "/empresa/frota/tarefas",
+    label: "Tarefas",
+    icon: "clipboard",
+    permission: PERMISSIONS.taskCreate,
+  },
+  {
     href: "/empresa/colaboradores",
     label: "Colaboradores",
     icon: "userCog",

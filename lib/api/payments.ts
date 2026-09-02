@@ -1,5 +1,5 @@
 import { apiFetch } from "@/lib/api/client";
-import type { PaymentStatus } from "@/lib/api/types";
+import type { PaymentStatus, PaymentsSummary } from "@/lib/api/types";
 
 export interface CompanyPayment {
   payment_id: string;
@@ -10,7 +10,15 @@ export interface CompanyPayment {
   created_at: string;
 }
 
-// A API não devolve totais prontos — somas/gráficos têm de ser calculados a partir da lista.
+// A API não devolve totais prontos para a lista — o resumo agregado vem de getCompanyPaymentsSummary().
 export function getCompanyPayments() {
   return apiFetch<CompanyPayment[]>("/payments/company");
+}
+
+/**
+ * Resumo financeiro já agregado pelo backend (recebido/pendente/falhado/cancelado
+ * + quebra por dia e por mês) — só dos pagamentos ligados às rotas da empresa.
+ */
+export function getCompanyPaymentsSummary() {
+  return apiFetch<PaymentsSummary>("/payments/company/summary");
 }

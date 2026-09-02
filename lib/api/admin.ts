@@ -1,5 +1,5 @@
 import { apiFetch } from "@/lib/api/client";
-import type { CompanyStatus, PaymentStatus } from "@/lib/api/types";
+import type { CompanyStatus, PaymentStatus, PaymentsSummary } from "@/lib/api/types";
 
 export interface PendingCompany {
   id: string;
@@ -13,6 +13,15 @@ export interface PendingCompany {
 
 export function getPendingCompanies() {
   return apiFetch<PendingCompany[]>("/admin/companies/pending");
+}
+
+/**
+ * Endpoint alternativo, equivalente a `/admin/companies/pending`. O backend expõe
+ * os dois; a app usa `getPendingCompanies()` — este existe só por paridade com o
+ * catálogo da API. Preferir sempre `getPendingCompanies()`.
+ */
+export function getPendingCompaniesLegacy() {
+  return apiFetch<PendingCompany[]>("/companies/pending");
 }
 
 export type CompanyModerationAction = "approve" | "reject" | "suspend";
@@ -65,6 +74,14 @@ export interface AdminPayment {
 
 export function getAllPayments(limit = 100, offset = 0) {
   return apiFetch<AdminPayment[]>(`/admin/payments?limit=${limit}&offset=${offset}`);
+}
+
+/**
+ * Resumo financeiro global da plataforma, já agregado pelo backend
+ * (recebido/pendente/falhado/cancelado + quebra por dia e por mês).
+ */
+export function getAdminPaymentsSummary() {
+  return apiFetch<PaymentsSummary>("/admin/payments/summary");
 }
 
 // Excepção operacional — usar quando o webhook do gateway falha. Não expor a operadores comuns.
@@ -169,4 +186,18 @@ export function updateGlobalRolePermissions(roleId: string, permissionCodes: str
 
 export function removeGlobalRoleUser(roleId: string, userId: string) {
   return apiFetch<{ detail: string }>(`/admin/roles/${roleId}/users/${userId}`, { method: "DELETE" });
+}
+
+export interface MyPermissions {
+  user_id: string;
+  permissions: string[];
+}
+
+/**
+ * Variante ADMIN de `/auth/my-permissions` — mesmo contrato. A app lê as
+ * permissões da sessão via `getMyPermissions()` (`lib/api/auth.ts`), usado por
+ * `lib/auth/session.ts`; este existe só por paridade com o catálogo da API.
+ */
+export function getAdminMyPermissions() {
+  return apiFetch<MyPermissions>("/admin/me/permissions");
 }
