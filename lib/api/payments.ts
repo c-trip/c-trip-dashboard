@@ -1,5 +1,10 @@
 import { apiFetch } from "@/lib/api/client";
-import type { PaymentStatus, PaymentsSummary } from "@/lib/api/types";
+import {
+  toQueryString,
+  type PaymentStatus,
+  type PaymentsSummary,
+  type PaymentsSummaryFilters,
+} from "@/lib/api/types";
 
 export interface CompanyPayment {
   payment_id: string;
@@ -15,10 +20,22 @@ export function getCompanyPayments() {
   return apiFetch<CompanyPayment[]>("/payments/company");
 }
 
+export interface CompanyPaymentsSummaryFilters extends PaymentsSummaryFilters {
+  /** Filtrar por rota da empresa (UUID). */
+  route_id?: string;
+  /** Filtrar por viagem da empresa (UUID). */
+  schedule_id?: string;
+}
+
 /**
  * Resumo financeiro já agregado pelo backend (recebido/pendente/falhado/cancelado
  * + quebra por dia e por mês) — só dos pagamentos ligados às rotas da empresa.
+ * Aceita filtros de período, método, rota e viagem.
  */
-export function getCompanyPaymentsSummary() {
-  return apiFetch<PaymentsSummary>("/payments/company/summary");
+export function getCompanyPaymentsSummary(
+  filters: CompanyPaymentsSummaryFilters = {},
+) {
+  return apiFetch<PaymentsSummary>(
+    `/payments/company/summary${toQueryString(filters)}`,
+  );
 }

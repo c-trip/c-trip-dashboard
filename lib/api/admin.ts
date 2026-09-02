@@ -1,5 +1,11 @@
 import { apiFetch } from "@/lib/api/client";
-import type { CompanyStatus, PaymentStatus, PaymentsSummary } from "@/lib/api/types";
+import {
+  toQueryString,
+  type CompanyStatus,
+  type PaymentStatus,
+  type PaymentsSummary,
+  type PaymentsSummaryFilters,
+} from "@/lib/api/types";
 
 export interface PendingCompany {
   id: string;
@@ -28,11 +34,17 @@ export type CompanyModerationAction = "approve" | "reject" | "suspend";
 
 // Não existe endpoint de "reverter suspensão" — reactivar uma empresa suspensa
 // é chamar "approve" de novo (ver guia de integração, secção Admin).
-export function moderateCompany(companyId: string, action: CompanyModerationAction) {
-  return apiFetch<{ id: string; status: CompanyStatus }>(`/admin/companies/actions/${action}`, {
-    method: "POST",
-    body: { company_id: companyId },
-  });
+export function moderateCompany(
+  companyId: string,
+  action: CompanyModerationAction,
+) {
+  return apiFetch<{ id: string; status: CompanyStatus }>(
+    `/admin/companies/actions/${action}`,
+    {
+      method: "POST",
+      body: { company_id: companyId },
+    },
+  );
 }
 
 export interface AdminCompany {
@@ -73,23 +85,40 @@ export interface AdminPayment {
 }
 
 export function getAllPayments(limit = 100, offset = 0) {
-  return apiFetch<AdminPayment[]>(`/admin/payments?limit=${limit}&offset=${offset}`);
+  return apiFetch<AdminPayment[]>(
+    `/admin/payments?limit=${limit}&offset=${offset}`,
+  );
+}
+
+export interface AdminPaymentsSummaryFilters extends PaymentsSummaryFilters {
+  /** Filtrar por empresa (UUID). */
+  company_id?: string;
+  /** Filtrar por status do pagamento. */
+  status?: PaymentStatus;
 }
 
 /**
  * Resumo financeiro global da plataforma, já agregado pelo backend
  * (recebido/pendente/falhado/cancelado + quebra por dia e por mês).
+ * Aceita filtros de período, método, empresa e status.
  */
-export function getAdminPaymentsSummary() {
-  return apiFetch<PaymentsSummary>("/admin/payments/summary");
+export function getAdminPaymentsSummary(
+  filters: AdminPaymentsSummaryFilters = {},
+) {
+  return apiFetch<PaymentsSummary>(
+    `/admin/payments/summary${toQueryString(filters)}`,
+  );
 }
 
 // Excepção operacional — usar quando o webhook do gateway falha. Não expor a operadores comuns.
 export function confirmPaymentManually(paymentId: string) {
-  return apiFetch<{ payment_id: string; status: "confirmed" }>("/payments/actions/confirm", {
-    method: "POST",
-    body: { payment_id: paymentId },
-  });
+  return apiFetch<{ payment_id: string; status: "confirmed" }>(
+    "/payments/actions/confirm",
+    {
+      method: "POST",
+      body: { payment_id: paymentId },
+    },
+  );
 }
 
 export interface AuditLogEntry {
@@ -154,10 +183,13 @@ export interface CreateGlobalRoleInput {
 }
 
 export function createGlobalRole(input: CreateGlobalRoleInput) {
-  return apiFetch<{ id: string; nome: string; descricao: string }>("/admin/roles", {
-    method: "POST",
-    body: input,
-  });
+  return apiFetch<{ id: string; nome: string; descricao: string }>(
+    "/admin/roles",
+    {
+      method: "POST",
+      body: input,
+    },
+  );
 }
 
 export interface GlobalRoleDetail {
@@ -174,18 +206,29 @@ export function getGlobalRole(roleId: string) {
 }
 
 export function deleteGlobalRole(roleId: string) {
-  return apiFetch<{ detail: string }>(`/admin/roles/${roleId}`, { method: "DELETE" });
-}
-
-export function updateGlobalRolePermissions(roleId: string, permissionCodes: string[]) {
-  return apiFetch<{ id: string; permission_count: number }>(`/admin/roles/${roleId}/permissions`, {
-    method: "PATCH",
-    body: { permission_codes: permissionCodes },
+  return apiFetch<{ detail: string }>(`/admin/roles/${roleId}`, {
+    method: "DELETE",
   });
 }
 
+export function updateGlobalRolePermissions(
+  roleId: string,
+  permissionCodes: string[],
+) {
+  return apiFetch<{ id: string; permission_count: number }>(
+    `/admin/roles/${roleId}/permissions`,
+    {
+      method: "PATCH",
+      body: { permission_codes: permissionCodes },
+    },
+  );
+}
+
 export function removeGlobalRoleUser(roleId: string, userId: string) {
-  return apiFetch<{ detail: string }>(`/admin/roles/${roleId}/users/${userId}`, { method: "DELETE" });
+  return apiFetch<{ detail: string }>(
+    `/admin/roles/${roleId}/users/${userId}`,
+    { method: "DELETE" },
+  );
 }
 
 export interface MyPermissions {
