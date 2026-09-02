@@ -15,19 +15,27 @@ interface PermissionOption {
 }
 
 interface PermissionChecklistProps {
-  name: string;
   options: PermissionOption[];
-  defaultSelected: string[];
+  /** Modo não-controlado: renderiza `<input type="hidden" name>` por código. */
+  name?: string;
+  defaultSelected?: string[];
+  /** Modo controlado: o pai guarda a selecção (e trata dos inputs se precisar). */
+  value?: string[];
+  onChange?: (codes: string[]) => void;
 }
 
 export function PermissionChecklist({
   name,
   options,
-  defaultSelected,
+  defaultSelected = [],
+  value,
+  onChange,
 }: PermissionChecklistProps) {
-  const [selected, setSelected] = useState<Set<string>>(
+  const controlled = value !== undefined;
+  const [internal, setInternal] = useState<Set<string>>(
     new Set(defaultSelected),
   );
+  const selected = controlled ? new Set(value) : internal;
   const [query, setQuery] = useState("");
 
   const groups = useMemo(() => {
@@ -49,14 +57,13 @@ export function PermissionChecklist({
     option.codigo.toLowerCase().includes(needle);
 
   function setMany(codigos: string[], on: boolean) {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      for (const codigo of codigos) {
-        if (on) next.add(codigo);
-        else next.delete(codigo);
-      }
-      return next;
-    });
+    const next = new Set(selected);
+    for (const codigo of codigos) {
+      if (on) next.add(codigo);
+      else next.delete(codigo);
+    }
+    if (controlled) onChange?.([...next]);
+    else setInternal(next);
   }
 
   const visibleGroups = groups
@@ -65,9 +72,11 @@ export function PermissionChecklist({
 
   return (
     <div className="flex flex-col gap-3">
-      {[...selected].map((codigo) => (
-        <input key={codigo} type="hidden" name={name} value={codigo} />
-      ))}
+      {name
+        ? [...selected].map((codigo) => (
+            <input key={codigo} type="hidden" name={name} value={codigo} />
+          ))
+        : null}
 
       <div className="flex items-center justify-between gap-3">
         <div className="relative flex-1">

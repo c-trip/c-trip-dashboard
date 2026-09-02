@@ -8,11 +8,9 @@ import { FormError, FormField } from "@/components/forms/form-field";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Step, Stepper } from "@/components/ui/stepper";
 import type { CompanyPermission } from "@/lib/api/companies";
-import { cn } from "@/lib/utils";
 import { initialActionState } from "@/lib/forms/action-state";
-
-const STEPS = ["Dados do colaborador", "Permissões"] as const;
 
 export function CollaboratorWizard({
   permissions,
@@ -27,9 +25,10 @@ export function CollaboratorWizard({
   );
   const [step, setStep] = useState(0);
   const [values, setValues] = useState({ name: "", email: "", password: "" });
+  const [perms, setPerms] = useState<string[]>([]);
   const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
 
-  const lastStep = canAssignPermissions ? 1 : 0;
+  const singleStep = !canAssignPermissions;
 
   function validateStep1() {
     const errors: Record<string, string> = {};
@@ -41,140 +40,127 @@ export function CollaboratorWizard({
     return Object.keys(errors).length === 0;
   }
 
-  const nameError = localErrors.name ?? state.fieldErrors?.name?.[0];
-  const emailError = localErrors.email ?? state.fieldErrors?.email?.[0];
-  const passwordError =
-    localErrors.password ?? state.fieldErrors?.password?.[0];
+  const err = (field: string) =>
+    localErrors[field] ?? state.fieldErrors?.[field]?.[0];
+
+  const identityFields = (
+    <>
+      <FormField
+        htmlFor="name"
+        label="Nome"
+        error={err("name") ? [err("name")!] : undefined}
+      >
+        <Input
+          id="name"
+          value={values.name}
+          onChange={(e) => setValues((v) => ({ ...v, name: e.target.value }))}
+          autoComplete="off"
+        />
+      </FormField>
+      <FormField
+        htmlFor="email"
+        label="Email"
+        error={err("email") ? [err("email")!] : undefined}
+      >
+        <Input
+          id="email"
+          type="email"
+          value={values.email}
+          onChange={(e) => setValues((v) => ({ ...v, email: e.target.value }))}
+          autoComplete="off"
+        />
+      </FormField>
+      <FormField
+        htmlFor="password"
+        label="Password provisória"
+        hint="O colaborador deve alterá-la no primeiro acesso."
+        error={err("password") ? [err("password")!] : undefined}
+      >
+        <Input
+          id="password"
+          type="password"
+          value={values.password}
+          onChange={(e) =>
+            setValues((v) => ({ ...v, password: e.target.value }))
+          }
+          autoComplete="new-password"
+        />
+      </FormField>
+    </>
+  );
 
   return (
     <Card>
-      <CardContent className="flex flex-col gap-6">
-        <ol className="flex items-center gap-2 text-sm">
-          {STEPS.slice(0, lastStep + 1).map((label, index) => (
-            <li key={label} className="flex items-center gap-2">
-              <span
-                className={cn(
-                  "flex size-6 items-center justify-center rounded-full text-xs font-semibold",
-                  index <= step
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground",
-                )}
-              >
-                {index + 1}
-              </span>
-              <span
-                className={
-                  index === step
-                    ? "font-medium text-foreground"
-                    : "text-muted-foreground"
-                }
-              >
-                {label}
-              </span>
-              {index < lastStep ? (
-                <span className="ms-1 text-muted-foreground">/</span>
-              ) : null}
-            </li>
+      <CardContent>
+        <form action={action} className="flex flex-col gap-6">
+          {/* Espelho sempre presente — os valores vão no FormData a partir de qualquer passo. */}
+          <input type="hidden" name="name" value={values.name} />
+          <input type="hidden" name="email" value={values.email} />
+          <input type="hidden" name="password" value={values.password} />
+          {perms.map((codigo) => (
+            <input
+              key={codigo}
+              type="hidden"
+              name="permission_codes"
+              value={codigo}
+            />
           ))}
-        </ol>
 
-        <form action={action} className="flex flex-col gap-5">
           <FormError message={state.formError} />
 
-          {/* Passo 1 — fica montado (só escondido) para os valores irem no FormData. */}
-          <div className={cn("flex flex-col gap-5", step !== 0 && "hidden")}>
-            <FormField
-              htmlFor="name"
-              label="Nome"
-              error={nameError ? [nameError] : undefined}
-            >
-              <Input
-                id="name"
-                name="name"
-                required
-                value={values.name}
-                onChange={(e) =>
-                  setValues((v) => ({ ...v, name: e.target.value }))
-                }
-              />
-            </FormField>
-            <FormField
-              htmlFor="email"
-              label="Email"
-              error={emailError ? [emailError] : undefined}
-            >
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={values.email}
-                onChange={(e) =>
-                  setValues((v) => ({ ...v, email: e.target.value }))
-                }
-              />
-            </FormField>
-            <FormField
-              htmlFor="password"
-              label="Password provisória"
-              hint="O colaborador deve alterá-la no primeiro acesso."
-              error={passwordError ? [passwordError] : undefined}
-            >
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                required
-                value={values.password}
-                onChange={(e) =>
-                  setValues((v) => ({ ...v, password: e.target.value }))
-                }
-              />
-            </FormField>
-
-            {lastStep === 0 ? (
+          {singleStep ? (
+            <div className="flex flex-col gap-5">
+              {identityFields}
               <Button type="submit" disabled={pending} className="w-fit">
                 {pending ? "A criar…" : "Criar colaborador"}
               </Button>
-            ) : (
-              <Button
-                type="button"
-                className="w-fit"
-                onClick={() => {
-                  if (validateStep1()) setStep(1);
-                }}
+            </div>
+          ) : (
+            <>
+              <Stepper
+                step={step}
+                labels={["Dados do colaborador", "Permissões"]}
               >
-                Continuar
-              </Button>
-            )}
-          </div>
+                <Step>{identityFields}</Step>
+                <Step>
+                  <p className="text-sm text-muted-foreground">
+                    Escolhe o que este colaborador pode fazer. Podes ajustar
+                    mais tarde na página dele.
+                  </p>
+                  <PermissionChecklist
+                    options={permissions}
+                    value={perms}
+                    onChange={setPerms}
+                  />
+                </Step>
+              </Stepper>
 
-          {/* Passo 2 — permissões. */}
-          {canAssignPermissions ? (
-            <div className={cn("flex flex-col gap-5", step !== 1 && "hidden")}>
-              <p className="text-sm text-muted-foreground">
-                Escolhe o que este colaborador pode fazer. Podes ajustar mais
-                tarde na página dele.
-              </p>
-              <PermissionChecklist
-                name="permission_codes"
-                options={permissions}
-                defaultSelected={[]}
-              />
-              <div className="flex items-center gap-3">
+              <div className="flex items-center justify-between gap-3">
                 <Button
                   type="button"
                   variant="outline"
+                  disabled={step === 0}
                   onClick={() => setStep(0)}
                 >
                   Voltar
                 </Button>
-                <Button type="submit" disabled={pending}>
-                  {pending ? "A criar…" : "Criar colaborador"}
-                </Button>
+                {step === 0 ? (
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      if (validateStep1()) setStep(1);
+                    }}
+                  >
+                    Continuar
+                  </Button>
+                ) : (
+                  <Button type="submit" disabled={pending}>
+                    {pending ? "A criar…" : "Criar colaborador"}
+                  </Button>
+                )}
               </div>
-            </div>
-          ) : null}
+            </>
+          )}
         </form>
       </CardContent>
     </Card>
