@@ -21,6 +21,10 @@ export const PERMISSIONS = {
   driverCreate: "driver:create",
   driverUpdate: "driver:update",
   taskCreate: "task:create",
+  // Venda ao balcão e operações de embarque (tag Operator da API). O backend
+  // autoriza pelo perfil `sales_operator`; assume-se este código no catálogo RBAC
+  // (`/companies/permissions`) — confirmar e ajustar se divergir.
+  bookingSell: "booking:sell",
   paymentReadCompany: "payment:read_company",
   paymentReadAll: "payment:read_all",
   paymentConfirm: "payment:confirm",

@@ -7,6 +7,8 @@ import {
   IoMapOutline,
   IoPeopleOutline,
   IoPersonCircleOutline,
+  IoQrCodeOutline,
+  IoScanOutline,
   IoShieldCheckmarkOutline,
   IoSpeedometerOutline,
 } from "react-icons/io5";
@@ -25,4 +27,6 @@ export const NAV_ICONS: Record<IconName, IconType> = {
   building: IoBusinessOutline,
   clipboard: IoClipboardOutline,
   shield: IoShieldCheckmarkOutline,
+  ticket: IoQrCodeOutline,
+  scan: IoScanOutline,
 };

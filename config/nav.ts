@@ -10,7 +10,9 @@ export type IconName =
   | "creditCard"
   | "building"
   | "clipboard"
-  | "shield";
+  | "shield"
+  | "ticket"
+  | "scan";
 
 export interface NavItem {
   href: string;
@@ -22,9 +24,24 @@ export interface NavItem {
 
 export const empresaNav: NavItem[] = [
   { href: "/empresa", label: "Visão geral", icon: "dashboard" },
-  { href: "/empresa/rotas", label: "Rotas", icon: "route", permission: PERMISSIONS.routeRead },
-  { href: "/empresa/horarios", label: "Horários", icon: "calendar", permission: PERMISSIONS.scheduleRead },
-  { href: "/empresa/frota/autocarros", label: "Autocarros", icon: "bus", permission: PERMISSIONS.busRead },
+  {
+    href: "/empresa/rotas",
+    label: "Rotas",
+    icon: "route",
+    permission: PERMISSIONS.routeRead,
+  },
+  {
+    href: "/empresa/horarios",
+    label: "Horários",
+    icon: "calendar",
+    permission: PERMISSIONS.scheduleRead,
+  },
+  {
+    href: "/empresa/frota/autocarros",
+    label: "Autocarros",
+    icon: "bus",
+    permission: PERMISSIONS.busRead,
+  },
   {
     href: "/empresa/frota/motoristas",
     label: "Motoristas",
@@ -36,6 +53,18 @@ export const empresaNav: NavItem[] = [
     label: "Tarefas",
     icon: "clipboard",
     permission: PERMISSIONS.taskCreate,
+  },
+  {
+    href: "/empresa/balcao",
+    label: "Balcão",
+    icon: "ticket",
+    permission: PERMISSIONS.bookingSell,
+  },
+  {
+    href: "/empresa/embarque",
+    label: "Embarque",
+    icon: "scan",
+    permission: PERMISSIONS.bookingSell,
   },
   {
     href: "/empresa/colaboradores",
