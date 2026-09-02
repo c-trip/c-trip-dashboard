@@ -5,9 +5,9 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import {
-  assignCompanyRole,
   createCollaborator,
   removeCollaborator,
+  replaceCollaboratorPermissions,
 } from "@/lib/api/companies";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { can, requirePermission } from "@/lib/auth/session";
@@ -17,7 +17,6 @@ const schema = z.object({
   name: z.string().min(2, { message: "Mínimo 2 caracteres." }),
   email: z.string().email({ message: "Introduz um email válido." }),
   password: z.string().min(6, { message: "Mínimo 6 caracteres." }),
-  role_id: z.string().optional().or(z.literal("")),
 });
 
 export async function createCollaboratorAction(
@@ -30,27 +29,33 @@ export async function createCollaboratorAction(
     name: formData.get("name"),
     email: formData.get("email"),
     password: formData.get("password"),
-    role_id: formData.get("role_id"),
   });
   if (!parsed.success) {
     return { fieldErrors: parsed.error.flatten().fieldErrors };
   }
 
-  const { name, email, password, role_id } = parsed.data;
+  const permissionCodes = formData
+    .getAll("permission_codes")
+    .map(String)
+    .filter(Boolean);
 
   // Passo 1 — criar a conta (nasce sem nenhum acesso).
   let user;
   try {
-    user = await createCollaborator({ name, email, password });
+    user = await createCollaborator(parsed.data);
   } catch (error) {
     return actionErrorState(error);
   }
 
-  // Passo 2 — atribuir a role escolhida. A API não tem endpoint atómico: a conta
-  // já existe, por isso qualquer falha aqui leva o gestor à página de permissões.
-  if (role_id && (await can(PERMISSIONS.companyRoleAssign))) {
+  // Passo 2 — gravar as permissões escolhidas. A API não tem endpoint atómico:
+  // a conta já existe, por isso qualquer falha aqui leva o gestor à página de
+  // permissões desse colaborador para terminar à mão.
+  if (
+    permissionCodes.length > 0 &&
+    (await can(PERMISSIONS.companyRoleAssign))
+  ) {
     try {
-      await assignCompanyRole(user.id, role_id);
+      await replaceCollaboratorPermissions(user.id, permissionCodes);
     } catch {
       revalidatePath("/empresa/colaboradores");
       redirect(`/empresa/colaboradores/${user.id}/permissoes?criado=1`);
@@ -58,7 +63,7 @@ export async function createCollaboratorAction(
   }
 
   revalidatePath("/empresa/colaboradores");
-  return { success: true };
+  redirect("/empresa/colaboradores");
 }
 
 export async function removeCollaboratorAction(userId: string) {

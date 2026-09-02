@@ -1,33 +1,18 @@
-import { unstable_rethrow } from "next/navigation";
+import Link from "next/link";
+import { IconPlus } from "@tabler/icons-react";
 
 import { CollaboratorRowActions } from "./collaborator-row-actions";
-import { CreateCollaboratorForm } from "./create-collaborator-form";
 import { CompanyBlocked } from "@/components/feedback/company-blocked";
 import { SimpleTable } from "@/components/tables/simple-table";
-import { flags } from "@/config/flags";
-import {
-  getCompanyRoles,
-  getCompanyUsers,
-  type CompanyRoleSummary,
-} from "@/lib/api/companies";
+import { buttonVariants } from "@/components/ui/button";
+import { getCompanyUsers } from "@/lib/api/companies";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { can, requirePermission } from "@/lib/auth/session";
-
-async function safe<T>(promise: Promise<T>, fallback: T): Promise<T> {
-  try {
-    return await promise;
-  } catch (error) {
-    unstable_rethrow(error);
-    return fallback;
-  }
-}
+import { cn } from "@/lib/utils";
 
 export default async function ColaboradoresPage() {
   await requirePermission(PERMISSIONS.companyReadUsers);
-  const [canCreate, canAssignAccess] = await Promise.all([
-    can(PERMISSIONS.companyCreateUser),
-    can(PERMISSIONS.companyRoleAssign),
-  ]);
+  const canCreate = await can(PERMISSIONS.companyCreateUser);
 
   let users;
   try {
@@ -45,34 +30,27 @@ export default async function ColaboradoresPage() {
     );
   }
 
-  // Roles atribuíveis para o select de "Acesso" no form de criação. A afinação
-  // fina de permissões fica na página dedicada (/colaboradores/[id]/permissoes).
-  let roles: CompanyRoleSummary[] = [];
-  if (canCreate && canAssignAccess) {
-    roles = await safe(getCompanyRoles(), [] as CompanyRoleSummary[]);
-    // Roles globais do sistema só entram se a flag permitir (igual à página de permissões).
-    if (!flags.ENABLE_GLOBAL_ROLE_ASSIGNMENT) {
-      roles = roles.filter((role) => role.empresa_id !== null);
-    }
-  }
-
   return (
     <div className="flex flex-col gap-6 animate-fade-in">
-      <div>
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Colaboradores
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Cria a conta e escolhe uma role de acesso — ou deixa sem acesso e
-          ajusta depois.
-        </p>
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
+            Colaboradores
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Contas da empresa e o que cada uma pode fazer.
+          </p>
+        </div>
+        {canCreate ? (
+          <Link
+            href="/empresa/colaboradores/novo"
+            className={cn(buttonVariants({ variant: "default" }))}
+          >
+            <IconPlus size={16} data-icon="inline-start" />
+            Novo colaborador
+          </Link>
+        ) : null}
       </div>
-      {canCreate ? (
-        <CreateCollaboratorForm
-          roles={roles}
-          canAssignAccess={canAssignAccess}
-        />
-      ) : null}
       <SimpleTable
         rows={users}
         rowKey={(user) => user.id}
