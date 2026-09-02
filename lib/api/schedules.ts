@@ -38,7 +38,10 @@ export interface ScheduleDetail {
 }
 
 export function createSchedule(input: CreateScheduleInput) {
-  return apiFetch<ScheduleDetail>("/schedules/", { method: "POST", body: input });
+  return apiFetch<ScheduleDetail>("/schedules/", {
+    method: "POST",
+    body: input,
+  });
 }
 
 export interface UpdateScheduleInput {
@@ -51,12 +54,49 @@ export interface UpdateScheduleInput {
 }
 
 export function updateSchedule(scheduleId: string, input: UpdateScheduleInput) {
-  return apiFetch<ScheduleDetail>(`/schedules/${scheduleId}`, { method: "PATCH", body: input });
+  return apiFetch<ScheduleDetail>(`/schedules/${scheduleId}`, {
+    method: "PATCH",
+    body: input,
+  });
 }
 
 export function cancelSchedule(scheduleId: string) {
-  return apiFetch<{ id: string; status: "cancelled" }>("/schedules/actions/cancel", {
-    method: "POST",
-    body: { schedule_id: scheduleId },
-  });
+  return apiFetch<{ id: string; status: "cancelled" }>(
+    "/schedules/actions/cancel",
+    {
+      method: "POST",
+      body: { schedule_id: scheduleId },
+    },
+  );
+}
+
+/**
+ * Detalhe completo de uma viagem (endpoint público). Traz os dados do autocarro e
+ * motorista associados — que a listagem `/schedules/company` não devolve.
+ */
+export interface ScheduleFullDetail {
+  id: string;
+  bus_model: string;
+  bus_plate: string;
+  driver_name: string;
+  departure_date: string;
+  departure_time: string;
+  status: ScheduleStatus;
+  total_seats: number;
+  boarding_cutoff_minutes: number;
+}
+
+export function getSchedule(scheduleId: string) {
+  return apiFetch<ScheduleFullDetail>(`/schedules/${scheduleId}`);
+}
+
+/** Mapa de lugares de uma viagem: quais estão livres e quais já foram reservados. */
+export interface ScheduleSeats {
+  total_seats: number;
+  available: number[];
+  occupied: number[];
+}
+
+export function getScheduleSeats(scheduleId: string) {
+  return apiFetch<ScheduleSeats>(`/schedules/${scheduleId}/seats`);
 }
