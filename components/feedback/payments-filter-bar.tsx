@@ -2,18 +2,27 @@
 
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import {
+  IconCalendarEvent,
+  IconCheck,
+  IconChevronDown,
+  IconFilter,
+} from "@tabler/icons-react";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 export interface PaymentsFilterValues {
   date_from?: string;
   date_to?: string;
   method?: string;
 }
-
-const selectClass =
-  "h-9 rounded-lg border border-input bg-background px-3 text-sm outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
 
 const METHODS: Array<{ value: string; label: string }> = [
   { value: "", label: "Todos os métodos" },
@@ -22,13 +31,11 @@ const METHODS: Array<{ value: string; label: string }> = [
   { value: "multicaixa_express", label: "Multicaixa Express" },
 ];
 
-const PERIODS: Array<{ value: string; label: string }> = [
-  { value: "", label: "Desde sempre" },
-  { value: "7d", label: "Últimos 7 dias" },
-  { value: "30d", label: "Últimos 30 dias" },
-  { value: "month", label: "Este mês" },
-  { value: "year", label: "Este ano" },
-  { value: "custom", label: "Intervalo personalizado" },
+const PRESETS: Array<{ key: string; label: string }> = [
+  { key: "7d", label: "Últimos 7 dias" },
+  { key: "30d", label: "Últimos 30 dias" },
+  { key: "month", label: "Este mês" },
+  { key: "year", label: "Este ano" },
 ];
 
 function ymd(date: Date): string {
@@ -37,46 +44,51 @@ function ymd(date: Date): string {
   ).padStart(2, "0")}`;
 }
 
-function rangeFor(period: string): { from: string; to: string } {
+function rangeFor(key: string): { from: string; to: string } {
   const today = new Date();
   const to = ymd(today);
-  if (period === "7d") {
+  if (key === "7d") {
     const d = new Date(today);
     d.setDate(d.getDate() - 6);
     return { from: ymd(d), to };
   }
-  if (period === "30d") {
+  if (key === "30d") {
     const d = new Date(today);
     d.setDate(d.getDate() - 29);
     return { from: ymd(d), to };
   }
-  if (period === "month") {
+  if (key === "month")
     return {
       from: ymd(new Date(today.getFullYear(), today.getMonth(), 1)),
       to,
     };
-  }
-  if (period === "year") {
+  if (key === "year")
     return { from: ymd(new Date(today.getFullYear(), 0, 1)), to };
-  }
   return { from: "", to: "" };
 }
 
-/** Deduz qual dos períodos pré-definidos corresponde ao intervalo actual. */
-function periodFromRange(from: string, to: string): string {
-  if (!from && !to) return "";
-  for (const key of ["7d", "30d", "month", "year"]) {
-    const r = rangeFor(key);
-    if (r.from === from && r.to === to) return key;
-  }
-  return "custom";
+function labelForRange(from: string, to: string): string {
+  if (!from && !to) return "Selecionar datas";
+  const preset = PRESETS.find((p) => {
+    const r = rangeFor(p.key);
+    return r.from === from && r.to === to;
+  });
+  if (preset) return preset.label;
+  const fmt = (s: string) =>
+    s
+      ? new Intl.DateTimeFormat("pt-AO", {
+          day: "2-digit",
+          month: "short",
+        }).format(new Date(s))
+      : "…";
+  return `${fmt(from)} – ${fmt(to)}`;
 }
 
-/**
- * Filtros do relatório de fluxo de caixa: período (com atalhos e intervalo
- * personalizado) e método de pagamento. Escreve na query string; os Server
- * Components lêem `searchParams` e re-pedem o resumo ao backend.
- */
+const triggerClass = cn(
+  buttonVariants({ variant: "outline", size: "sm" }),
+  "gap-1.5",
+);
+
 export function PaymentsFilterBar({
   initial,
 }: {
@@ -84,98 +96,147 @@ export function PaymentsFilterBar({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-
-  const initialPeriod = periodFromRange(
-    initial.date_from ?? "",
-    initial.date_to ?? "",
-  );
-  const [period, setPeriod] = useState(initialPeriod);
-  const [dateFrom, setDateFrom] = useState(initial.date_from ?? "");
-  const [dateTo, setDateTo] = useState(initial.date_to ?? "");
+  const from = initial.date_from ?? "";
+  const to = initial.date_to ?? "";
   const method = initial.method ?? "";
 
-  function push(next: { from: string; to: string; method: string }) {
+  const [draftFrom, setDraftFrom] = useState(from);
+  const [draftTo, setDraftTo] = useState(to);
+
+  function push(next: PaymentsFilterValues) {
     const params = new URLSearchParams();
-    if (next.from) params.set("date_from", next.from);
-    if (next.to) params.set("date_to", next.to);
+    if (next.date_from) params.set("date_from", next.date_from);
+    if (next.date_to) params.set("date_to", next.date_to);
     if (next.method) params.set("method", next.method);
     const query = params.toString();
     router.push(query ? `${pathname}?${query}` : pathname);
   }
 
-  function onPeriodChange(value: string) {
-    setPeriod(value);
-    if (value === "custom") return; // espera o "Aplicar"
-    const { from, to } = rangeFor(value);
-    setDateFrom(from);
-    setDateTo(to);
-    push({ from, to, method });
-  }
-
-  const customDirty =
-    period === "custom" &&
-    (dateFrom !== (initial.date_from ?? "") ||
-      dateTo !== (initial.date_to ?? ""));
+  const methodLabel =
+    METHODS.find((m) => m.value === method)?.label ?? "Todos os métodos";
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      <select
-        aria-label="Período"
-        value={period}
-        onChange={(e) => onPeriodChange(e.target.value)}
-        className={selectClass}
-      >
-        {PERIODS.map((p) => (
-          <option key={p.value || "all"} value={p.value}>
-            {p.label}
-          </option>
-        ))}
-      </select>
+    <div className="flex flex-wrap items-center gap-2">
+      <Popover>
+        <PopoverTrigger className={triggerClass}>
+          <IconCalendarEvent size={16} />
+          {labelForRange(from, to)}
+          <IconChevronDown size={14} className="text-muted-foreground" />
+        </PopoverTrigger>
+        <PopoverContent className="w-64">
+          <div className="flex flex-col gap-1">
+            {PRESETS.map((p) => {
+              const r = rangeFor(p.key);
+              const active = r.from === from && r.to === to;
+              return (
+                <button
+                  key={p.key}
+                  type="button"
+                  onClick={() =>
+                    push({ date_from: r.from, date_to: r.to, method })
+                  }
+                  className={cn(
+                    "flex items-center justify-between rounded-lg px-2.5 py-1.5 text-sm transition-colors hover:bg-muted",
+                    active && "font-medium text-primary",
+                  )}
+                >
+                  {p.label}
+                  {active ? <IconCheck size={15} /> : null}
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-3 flex flex-col gap-2 border-t border-border pt-3">
+            <p className="text-xs font-medium text-muted-foreground">
+              Intervalo personalizado
+            </p>
+            <div className="flex items-center gap-2">
+              <Input
+                type="date"
+                aria-label="De"
+                value={draftFrom}
+                max={draftTo || undefined}
+                onChange={(e) => setDraftFrom(e.target.value)}
+                className="h-9"
+              />
+              <Input
+                type="date"
+                aria-label="Até"
+                value={draftTo}
+                min={draftFrom || undefined}
+                onChange={(e) => setDraftTo(e.target.value)}
+                className="h-9"
+              />
+            </div>
+            <Button
+              type="button"
+              size="sm"
+              disabled={
+                !draftFrom || !draftTo || (draftFrom === from && draftTo === to)
+              }
+              onClick={() =>
+                push({ date_from: draftFrom, date_to: draftTo, method })
+              }
+            >
+              Aplicar intervalo
+            </Button>
+          </div>
+        </PopoverContent>
+      </Popover>
 
-      {period === "custom" ? (
-        <div className="flex items-center gap-2">
-          <Input
-            type="date"
-            aria-label="Data inicial"
-            value={dateFrom}
-            max={dateTo || undefined}
-            onChange={(e) => setDateFrom(e.target.value)}
-            className="h-9 w-40"
-          />
-          <span className="text-sm text-muted-foreground">até</span>
-          <Input
-            type="date"
-            aria-label="Data final"
-            value={dateTo}
-            min={dateFrom || undefined}
-            onChange={(e) => setDateTo(e.target.value)}
-            className="h-9 w-40"
-          />
-          <Button
-            type="button"
-            size="sm"
-            disabled={!customDirty || !dateFrom || !dateTo}
-            onClick={() => push({ from: dateFrom, to: dateTo, method })}
-          >
-            Aplicar
-          </Button>
-        </div>
+      <Popover>
+        <PopoverTrigger className={triggerClass}>
+          <IconFilter size={16} />
+          Filtros
+          {method ? (
+            <span className="rounded-full bg-primary/10 px-1.5 text-xs font-semibold text-primary">
+              1
+            </span>
+          ) : null}
+          <IconChevronDown size={14} className="text-muted-foreground" />
+        </PopoverTrigger>
+        <PopoverContent align="end" className="w-56">
+          <p className="mb-2 text-xs font-medium text-muted-foreground">
+            Método de pagamento
+          </p>
+          <div className="flex flex-col gap-0.5">
+            {METHODS.map((m) => (
+              <button
+                key={m.value || "all"}
+                type="button"
+                onClick={() =>
+                  push({ date_from: from, date_to: to, method: m.value })
+                }
+                className={cn(
+                  "flex items-center justify-between rounded-lg px-2.5 py-1.5 text-sm transition-colors hover:bg-muted",
+                  method === m.value && "font-medium text-primary",
+                )}
+              >
+                {m.label}
+                {method === m.value ? <IconCheck size={15} /> : null}
+              </button>
+            ))}
+          </div>
+        </PopoverContent>
+      </Popover>
+
+      {(from || to || method) && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => push({})}
+          className="text-muted-foreground"
+        >
+          Limpar
+        </Button>
+      )}
+
+      {method ? (
+        <span className="ms-1 text-xs text-muted-foreground">
+          · {methodLabel}
+        </span>
       ) : null}
-
-      <select
-        aria-label="Método de pagamento"
-        value={method}
-        onChange={(e) =>
-          push({ from: dateFrom, to: dateTo, method: e.target.value })
-        }
-        className={`${selectClass} ms-auto`}
-      >
-        {METHODS.map((m) => (
-          <option key={m.value || "all"} value={m.value}>
-            {m.label}
-          </option>
-        ))}
-      </select>
     </div>
   );
 }
