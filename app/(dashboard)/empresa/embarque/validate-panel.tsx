@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState, useTransition } from "react";
+import { useActionState, useRef, useState, useTransition } from "react";
 
 import {
   recordAction,
@@ -9,6 +9,7 @@ import {
 } from "./actions";
 import { FormError, FormField } from "@/components/forms/form-field";
 import { StatusBadge } from "@/components/feedback/status-badge";
+import { QrScanner } from "@/components/operator/qr-scanner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,8 +23,15 @@ export function ValidatePanel({ scheduleId }: { scheduleId?: string }) {
   const [recording, startRecording] = useTransition();
   const [boarded, setBoarded] = useState<string | null>(null);
   const [recordError, setRecordError] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const hashRef = useRef<HTMLInputElement>(null);
 
   const result = state.result;
+
+  function handleScan(hash: string) {
+    if (hashRef.current) hashRef.current.value = hash;
+    formRef.current?.requestSubmit();
+  }
 
   function handleRecord() {
     if (!state.qrHash) return;
@@ -41,22 +49,23 @@ export function ValidatePanel({ scheduleId }: { scheduleId?: string }) {
   return (
     <Card>
       <CardContent className="flex flex-col gap-5">
-        <form action={action} className="flex flex-col gap-4">
+        <form ref={formRef} action={action} className="flex flex-col gap-4">
           <FormError message={state.formError} />
           {scheduleId ? (
             <input type="hidden" name="schedule_id" value={scheduleId} />
           ) : null}
+          <QrScanner onScan={handleScan} />
           <FormField
             htmlFor="qr_hash"
-            label="Código do QR"
+            label="Ou introduz o código do QR"
             error={state.fieldErrors?.qr_hash}
           >
             <Input
+              ref={hashRef}
               id="qr_hash"
               name="qr_hash"
               placeholder="32 caracteres hexadecimais"
               autoComplete="off"
-              autoFocus
             />
           </FormField>
           <Button type="submit" disabled={pending} className="w-fit">

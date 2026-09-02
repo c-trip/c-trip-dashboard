@@ -24,14 +24,17 @@ export function QrTicket({
   validUntil,
 }: QrTicketProps) {
   return (
-    <Card className="max-w-sm print:border-0 print:shadow-none">
+    <Card
+      data-print-ticket
+      className="max-w-sm print:border-0 print:shadow-none"
+    >
       <CardContent className="flex flex-col items-center gap-4 text-center">
         {/* qr_image é um data URI SVG devolvido pelo backend — não passa por next/image. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={qrImage}
           alt={`QR do bilhete de ${passengerName}`}
-          className="size-48"
+          className="size-48 print:size-40"
         />
         <div className="flex flex-col gap-1">
           <p className="text-base font-bold text-foreground">{passengerName}</p>
