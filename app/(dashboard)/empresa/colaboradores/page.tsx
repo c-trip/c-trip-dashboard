@@ -6,10 +6,8 @@ import { CompanyBlocked } from "@/components/feedback/company-blocked";
 import { SimpleTable } from "@/components/tables/simple-table";
 import { flags } from "@/config/flags";
 import {
-  getAssignableCompanyPermissions,
   getCompanyRoles,
   getCompanyUsers,
-  type CompanyPermission,
   type CompanyRoleSummary,
 } from "@/lib/api/companies";
 import { PERMISSIONS } from "@/lib/auth/permissions";
@@ -47,14 +45,11 @@ export default async function ColaboradoresPage() {
     );
   }
 
-  // Catálogo para o form combinado — só faz sentido buscar se der para criar E atribuir acesso.
+  // Roles atribuíveis para o select de "Acesso" no form de criação. A afinação
+  // fina de permissões fica na página dedicada (/colaboradores/[id]/permissoes).
   let roles: CompanyRoleSummary[] = [];
-  let permissions: CompanyPermission[] = [];
   if (canCreate && canAssignAccess) {
-    [roles, permissions] = await Promise.all([
-      safe(getCompanyRoles(), [] as CompanyRoleSummary[]),
-      safe(getAssignableCompanyPermissions(), [] as CompanyPermission[]),
-    ]);
+    roles = await safe(getCompanyRoles(), [] as CompanyRoleSummary[]);
     // Roles globais do sistema só entram se a flag permitir (igual à página de permissões).
     if (!flags.ENABLE_GLOBAL_ROLE_ASSIGNMENT) {
       roles = roles.filter((role) => role.empresa_id !== null);
@@ -68,14 +63,13 @@ export default async function ColaboradoresPage() {
           Colaboradores
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          A conta e o acesso definem-se de uma vez — ou deixa sem acesso e
+          Cria a conta e escolhe uma role de acesso — ou deixa sem acesso e
           ajusta depois.
         </p>
       </div>
       {canCreate ? (
         <CreateCollaboratorForm
           roles={roles}
-          permissions={permissions}
           canAssignAccess={canAssignAccess}
         />
       ) : null}
