@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
-import { FormField } from "@/components/forms/form-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -14,14 +13,69 @@ export interface PaymentsFilterValues {
 }
 
 const selectClass =
-  "flex h-10 w-full min-w-0 rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
+  "h-9 rounded-lg border border-input bg-background px-3 text-sm outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
 
-const METHODS = ["cash", "pos", "multicaixa_express"] as const;
+const METHODS: Array<{ value: string; label: string }> = [
+  { value: "", label: "Todos os métodos" },
+  { value: "cash", label: "Dinheiro" },
+  { value: "pos", label: "POS" },
+  { value: "multicaixa_express", label: "Multicaixa Express" },
+];
+
+const PERIODS: Array<{ value: string; label: string }> = [
+  { value: "", label: "Desde sempre" },
+  { value: "7d", label: "Últimos 7 dias" },
+  { value: "30d", label: "Últimos 30 dias" },
+  { value: "month", label: "Este mês" },
+  { value: "year", label: "Este ano" },
+  { value: "custom", label: "Intervalo personalizado" },
+];
+
+function ymd(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
+    date.getDate(),
+  ).padStart(2, "0")}`;
+}
+
+function rangeFor(period: string): { from: string; to: string } {
+  const today = new Date();
+  const to = ymd(today);
+  if (period === "7d") {
+    const d = new Date(today);
+    d.setDate(d.getDate() - 6);
+    return { from: ymd(d), to };
+  }
+  if (period === "30d") {
+    const d = new Date(today);
+    d.setDate(d.getDate() - 29);
+    return { from: ymd(d), to };
+  }
+  if (period === "month") {
+    return {
+      from: ymd(new Date(today.getFullYear(), today.getMonth(), 1)),
+      to,
+    };
+  }
+  if (period === "year") {
+    return { from: ymd(new Date(today.getFullYear(), 0, 1)), to };
+  }
+  return { from: "", to: "" };
+}
+
+/** Deduz qual dos períodos pré-definidos corresponde ao intervalo actual. */
+function periodFromRange(from: string, to: string): string {
+  if (!from && !to) return "";
+  for (const key of ["7d", "30d", "month", "year"]) {
+    const r = rangeFor(key);
+    if (r.from === from && r.to === to) return key;
+  }
+  return "custom";
+}
 
 /**
- * Barra de filtros para os dashboards de pagamentos. Escreve os filtros na query
- * string — os Server Components lêem `searchParams` e re-pedem o resumo ao backend.
- * `offset` (paginação) é preservado quando existe.
+ * Filtros do relatório de fluxo de caixa: período (com atalhos e intervalo
+ * personalizado) e método de pagamento. Escreve na query string; os Server
+ * Components lêem `searchParams` e re-pedem o resumo ao backend.
  */
 export function PaymentsFilterBar({
   initial,
@@ -30,73 +84,98 @@ export function PaymentsFilterBar({
 }) {
   const router = useRouter();
   const pathname = usePathname();
+
+  const initialPeriod = periodFromRange(
+    initial.date_from ?? "",
+    initial.date_to ?? "",
+  );
+  const [period, setPeriod] = useState(initialPeriod);
   const [dateFrom, setDateFrom] = useState(initial.date_from ?? "");
   const [dateTo, setDateTo] = useState(initial.date_to ?? "");
-  const [method, setMethod] = useState(initial.method ?? "");
+  const method = initial.method ?? "";
 
-  function apply() {
+  function push(next: { from: string; to: string; method: string }) {
     const params = new URLSearchParams();
-    if (dateFrom) params.set("date_from", dateFrom);
-    if (dateTo) params.set("date_to", dateTo);
-    if (method) params.set("method", method);
+    if (next.from) params.set("date_from", next.from);
+    if (next.to) params.set("date_to", next.to);
+    if (next.method) params.set("method", next.method);
     const query = params.toString();
     router.push(query ? `${pathname}?${query}` : pathname);
   }
 
-  function clear() {
-    setDateFrom("");
-    setDateTo("");
-    setMethod("");
-    router.push(pathname);
+  function onPeriodChange(value: string) {
+    setPeriod(value);
+    if (value === "custom") return; // espera o "Aplicar"
+    const { from, to } = rangeFor(value);
+    setDateFrom(from);
+    setDateTo(to);
+    push({ from, to, method });
   }
 
-  const hasFilters = Boolean(dateFrom || dateTo || method);
+  const customDirty =
+    period === "custom" &&
+    (dateFrom !== (initial.date_from ?? "") ||
+      dateTo !== (initial.date_to ?? ""));
 
   return (
-    <div className="flex flex-wrap items-end gap-3 rounded-xl border border-border bg-card p-4 shadow-xs">
-      <FormField htmlFor="date_from" label="De" className="min-w-36 flex-1">
-        <Input
-          id="date_from"
-          type="date"
-          value={dateFrom}
-          max={dateTo || undefined}
-          onChange={(e) => setDateFrom(e.target.value)}
-        />
-      </FormField>
-      <FormField htmlFor="date_to" label="Até" className="min-w-36 flex-1">
-        <Input
-          id="date_to"
-          type="date"
-          value={dateTo}
-          min={dateFrom || undefined}
-          onChange={(e) => setDateTo(e.target.value)}
-        />
-      </FormField>
-      <FormField htmlFor="method" label="Método" className="min-w-40 flex-1">
-        <select
-          id="method"
-          value={method}
-          onChange={(e) => setMethod(e.target.value)}
-          className={selectClass}
-        >
-          <option value="">Todos</option>
-          {METHODS.map((m) => (
-            <option key={m} value={m}>
-              {m}
-            </option>
-          ))}
-        </select>
-      </FormField>
-      <div className="flex gap-2">
-        <Button type="button" onClick={apply}>
-          Aplicar
-        </Button>
-        {hasFilters ? (
-          <Button type="button" variant="outline" onClick={clear}>
-            Limpar
+    <div className="flex flex-wrap items-center gap-3">
+      <select
+        aria-label="Período"
+        value={period}
+        onChange={(e) => onPeriodChange(e.target.value)}
+        className={selectClass}
+      >
+        {PERIODS.map((p) => (
+          <option key={p.value || "all"} value={p.value}>
+            {p.label}
+          </option>
+        ))}
+      </select>
+
+      {period === "custom" ? (
+        <div className="flex items-center gap-2">
+          <Input
+            type="date"
+            aria-label="Data inicial"
+            value={dateFrom}
+            max={dateTo || undefined}
+            onChange={(e) => setDateFrom(e.target.value)}
+            className="h-9 w-40"
+          />
+          <span className="text-sm text-muted-foreground">até</span>
+          <Input
+            type="date"
+            aria-label="Data final"
+            value={dateTo}
+            min={dateFrom || undefined}
+            onChange={(e) => setDateTo(e.target.value)}
+            className="h-9 w-40"
+          />
+          <Button
+            type="button"
+            size="sm"
+            disabled={!customDirty || !dateFrom || !dateTo}
+            onClick={() => push({ from: dateFrom, to: dateTo, method })}
+          >
+            Aplicar
           </Button>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
+
+      <select
+        aria-label="Método de pagamento"
+        value={method}
+        onChange={(e) =>
+          push({ from: dateFrom, to: dateTo, method: e.target.value })
+        }
+        className={`${selectClass} ms-auto`}
+      >
+        {METHODS.map((m) => (
+          <option key={m.value || "all"} value={m.value}>
+            {m.label}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }
