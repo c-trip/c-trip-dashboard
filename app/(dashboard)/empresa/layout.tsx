@@ -7,7 +7,11 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { empresaNav } from "@/config/nav";
 import { getPermissions, requireAuth } from "@/lib/auth/session";
 
-export default async function EmpresaLayout({ children }: { children: ReactNode }) {
+export default async function EmpresaLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const session = await requireAuth();
 
   if (session.role === "passenger") {
@@ -16,7 +20,10 @@ export default async function EmpresaLayout({ children }: { children: ReactNode 
 
   const permissions = await getPermissions();
   const items = empresaNav.filter(
-    (item) => !item.permission || session.role === "admin" || permissions.includes(item.permission)
+    (item) =>
+      !item.permission ||
+      session.role === "admin" ||
+      permissions.includes(item.permission),
   );
 
   return (
@@ -28,10 +35,18 @@ export default async function EmpresaLayout({ children }: { children: ReactNode 
         } as CSSProperties
       }
     >
-      <AppSidebar variant="inset" items={items} sectionLabel="Gestor" session={session} />
+      <AppSidebar
+        variant="inset"
+        items={items}
+        sectionLabel="Gestor"
+        session={session}
+        accountHref="/empresa/conta"
+      />
       <SidebarInset>
         <SiteHeader title="Painel do Gestor" />
-        <div className="flex-1 overflow-y-auto bg-muted/20 p-4 md:p-8">{children}</div>
+        <div className="flex-1 overflow-y-auto bg-muted/20 p-4 md:p-8">
+          {children}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );
