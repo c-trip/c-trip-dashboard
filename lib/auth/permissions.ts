@@ -21,10 +21,14 @@ export const PERMISSIONS = {
   driverCreate: "driver:create",
   driverUpdate: "driver:update",
   taskCreate: "task:create",
-  // Venda ao balcão e operações de embarque (tag Operator da API). O backend
-  // autoriza pelo perfil `sales_operator`; assume-se este código no catálogo RBAC
-  // (`/companies/permissions`) — confirmar e ajustar se divergir.
+  // Balcão e embarque (endpoints /boarding/* + venda ao balcão). Cada operação
+  // tem o seu código — dá para ter uma bilheteira só com `booking:sell`, um
+  // fiscal só com `boarding:validate`/`boarding:record`, etc.
   bookingSell: "booking:sell",
+  boardingReadSchedules: "boarding:read_schedules",
+  boardingValidate: "boarding:validate",
+  boardingRecord: "boarding:record",
+  financeReportDaily: "finance:report_daily",
   paymentReadCompany: "payment:read_company",
   paymentReadAll: "payment:read_all",
   paymentConfirm: "payment:confirm",

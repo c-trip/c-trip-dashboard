@@ -33,7 +33,7 @@ export async function validateAction(
   _prevState: ValidateActionState,
   formData: FormData,
 ): Promise<ValidateActionState> {
-  await requirePermission(PERMISSIONS.bookingSell);
+  await requirePermission(PERMISSIONS.boardingValidate);
 
   const parsed = hashSchema.safeParse({
     qr_hash: formData.get("qr_hash"),
@@ -58,7 +58,7 @@ export async function recordAction(
   qrHash: string,
   scheduleId: string | undefined,
 ): Promise<RecordActionState> {
-  await requirePermission(PERMISSIONS.bookingSell);
+  await requirePermission(PERMISSIONS.boardingRecord);
 
   try {
     const record = await recordBoarding(qrHash, scheduleId);

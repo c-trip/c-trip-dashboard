@@ -14,7 +14,7 @@ function str(value: string | string[] | undefined): string | undefined {
 export default async function EmbarquePage({
   searchParams,
 }: PageProps<"/empresa/embarque">) {
-  await requirePermission(PERMISSIONS.bookingSell);
+  await requirePermission(PERMISSIONS.boardingValidate);
   const scheduleId = str((await searchParams)?.schedule_id);
 
   let schedules;

@@ -13,7 +13,7 @@ function str(value: string | string[] | undefined): string | undefined {
 export default async function RelatoriosPage({
   searchParams,
 }: PageProps<"/empresa/relatorios">) {
-  await requirePermission(PERMISSIONS.paymentReadCompany);
+  await requirePermission(PERMISSIONS.financeReportDaily);
 
   const params = await searchParams;
   const filters = {

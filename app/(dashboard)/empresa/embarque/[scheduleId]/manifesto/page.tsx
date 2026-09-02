@@ -14,7 +14,7 @@ import { requirePermission } from "@/lib/auth/session";
 export default async function ManifestoPage({
   params,
 }: PageProps<"/empresa/embarque/[scheduleId]/manifesto">) {
-  await requirePermission(PERMISSIONS.bookingSell);
+  await requirePermission(PERMISSIONS.boardingValidate);
   const { scheduleId } = await params;
 
   let manifest, detail;

@@ -8,6 +8,6 @@ export async function reprintQrAction(
   scheduleId: string,
   seatNumber: number,
 ): Promise<ReprintQrResponse> {
-  await requirePermission(PERMISSIONS.bookingSell);
+  await requirePermission(PERMISSIONS.boardingValidate);
   return reprintQr(scheduleId, seatNumber);
 }

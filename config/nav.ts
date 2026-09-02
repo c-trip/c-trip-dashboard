@@ -65,7 +65,7 @@ export const empresaNav: NavItem[] = [
     href: "/empresa/embarque",
     label: "Embarque",
     icon: "scan",
-    permission: PERMISSIONS.bookingSell,
+    permission: PERMISSIONS.boardingValidate,
   },
   {
     href: "/empresa/colaboradores",
@@ -83,7 +83,7 @@ export const empresaNav: NavItem[] = [
     href: "/empresa/relatorios",
     label: "Fluxo de caixa",
     icon: "report",
-    permission: PERMISSIONS.paymentReadCompany,
+    permission: PERMISSIONS.financeReportDaily,
   },
 ];
 
