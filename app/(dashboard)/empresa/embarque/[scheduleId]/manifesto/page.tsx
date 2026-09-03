@@ -11,6 +11,10 @@ import { getSchedule } from "@/lib/api/schedules";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { requirePermission } from "@/lib/auth/session";
 
+function str(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
 async function safe<T>(promise: Promise<T>, fallback: T): Promise<T> {
   try {
     return await promise;
@@ -22,14 +26,16 @@ async function safe<T>(promise: Promise<T>, fallback: T): Promise<T> {
 
 export default async function ManifestoPage({
   params,
+  searchParams,
 }: PageProps<"/empresa/embarque/[scheduleId]/manifesto">) {
   await requirePermission(PERMISSIONS.boardingValidate);
   const { scheduleId } = await params;
+  const showAll = str((await searchParams)?.status) === "all";
 
   let manifest, detail, schedules;
   try {
     [manifest, detail, schedules] = await Promise.all([
-      getManifest(scheduleId),
+      getManifest(scheduleId, showAll ? "all" : undefined),
       safe(getSchedule(scheduleId), null),
       safe(getOperatorSchedules(), []),
     ]);
@@ -46,8 +52,11 @@ export default async function ManifestoPage({
     );
   }
 
-  const confirmed = manifest.filter((row) => row.status === "confirmed").length;
+  const rows = [...manifest].sort((a, b) => a.seat - b.seat);
+  const confirmed = rows.filter((r) => r.status === "confirmed");
+  const boarded = confirmed.filter((r) => r.boarded).length;
   const trip = schedules.find((s) => s.schedule_id === scheduleId);
+  const base = `/empresa/embarque/${scheduleId}/manifesto`;
 
   return (
     <div className="flex max-w-2xl flex-col gap-6 animate-fade-in">
@@ -60,22 +69,26 @@ export default async function ManifestoPage({
           {detail
             ? `${detail.departure_date} ${detail.departure_time} · `
             : null}
-          {confirmed} de {manifest.length} lugar(es) confirmado(s)
+          <span className="font-medium text-foreground tabular-nums">
+            {boarded}/{confirmed.length}
+          </span>{" "}
+          embarcados
         </p>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
         <SchedulePicker schedules={schedules} selected={scheduleId} />
         <EmbarqueNav scheduleId={scheduleId} />
+        <a
+          href={showAll ? base : `${base}?status=all`}
+          className="ms-auto text-sm text-primary hover:underline"
+        >
+          {showAll ? "Só confirmadas" : "Ver canceladas"}
+        </a>
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        A API do manifesto não devolve o nome do passageiro — só lugar, reserva
-        e estado. O nome aparece ao validar o QR de cada bilhete.
-      </p>
-
       <SimpleTable
-        rows={[...manifest].sort((a, b) => a.seat - b.seat)}
+        rows={rows}
         rowKey={(row) => row.booking_id}
         emptyTitle="Sem reservas"
         emptyDescription="Ainda não há reservas para esta viagem."
@@ -87,16 +100,40 @@ export default async function ManifestoPage({
             ),
           },
           {
-            header: "Reserva",
+            header: "Passageiro",
             cell: (row) => (
-              <span className="font-mono text-xs text-muted-foreground">
-                {row.booking_id.slice(0, 8).toUpperCase()}
-              </span>
+              <div>
+                <p className="font-medium text-foreground">
+                  {row.passenger?.trim() || "Sem nome"}
+                </p>
+                {row.phone || row.id_doc ? (
+                  <p className="text-xs text-muted-foreground">
+                    {[row.phone, row.id_doc].filter(Boolean).join(" · ")}
+                  </p>
+                ) : null}
+              </div>
             ),
           },
           {
             header: "Estado",
-            cell: (row) => <StatusBadge domain="booking" status={row.status} />,
+            cell: (row) =>
+              row.boarded ? (
+                <span className="inline-flex flex-col gap-0.5">
+                  <span className="font-medium text-emerald-600 dark:text-emerald-400">
+                    Embarcou
+                  </span>
+                  {row.boarded_at ? (
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(row.boarded_at).toLocaleTimeString("pt-AO", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  ) : null}
+                </span>
+              ) : (
+                <StatusBadge domain="booking" status={row.status} />
+              ),
           },
           {
             header: "",

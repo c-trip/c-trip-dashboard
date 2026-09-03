@@ -114,11 +114,22 @@ export interface ManifestItem {
   booking_id: string;
   seat: number;
   status: string;
+  /** Nome do passageiro (registado ou venda ao balcão). */
+  passenger?: string | null;
+  /** Telefone — útil para contactar um no-show. */
+  phone?: string | null;
+  /** Documento de identificação (venda ao balcão). */
+  id_doc?: string | null;
+  boarded?: boolean;
+  boarded_at?: string | null;
 }
 
-/** Manifesto de passageiros de uma viagem (todas as reservas e o seu estado). */
-export function getManifest(scheduleId: string) {
+/**
+ * Manifesto de passageiros de uma viagem (nome, lugar, estado, embarque).
+ * `status=all` inclui reservas canceladas/expiradas; omitir = só as confirmadas.
+ */
+export function getManifest(scheduleId: string, status?: "all") {
   return apiFetch<ManifestItem[]>(
-    `/boarding/manifest${toQueryString({ schedule_id: scheduleId })}`,
+    `/boarding/manifest${toQueryString({ schedule_id: scheduleId, status })}`,
   );
 }
