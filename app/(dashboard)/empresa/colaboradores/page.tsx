@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { IconPlus } from "@tabler/icons-react";
 
-import { CollaboratorRowActions } from "./collaborator-row-actions";
+import { CollaboratorList } from "./collaborator-list";
 import { CompanyBlocked } from "@/components/feedback/company-blocked";
-import { SimpleTable } from "@/components/tables/simple-table";
 import { buttonVariants } from "@/components/ui/button";
 import { getCompanyUsers } from "@/lib/api/companies";
 import { PERMISSIONS } from "@/lib/auth/permissions";
@@ -51,38 +50,7 @@ export default async function ColaboradoresPage() {
           </Link>
         ) : null}
       </div>
-      <SimpleTable
-        rows={users}
-        rowKey={(user) => user.id}
-        emptyTitle="Ainda não há colaboradores"
-        emptyDescription="Adiciona o primeiro colaborador para começar a atribuir tarefas e permissões."
-        columns={[
-          {
-            header: "Nome",
-            cell: (u) => <span className="font-medium">{u.name}</span>,
-          },
-          { header: "Email", cell: (u) => u.email },
-          {
-            header: "Estado",
-            cell: (u) => (
-              <span
-                className={
-                  u.is_active
-                    ? "text-emerald-600 dark:text-emerald-400 font-medium"
-                    : "text-muted-foreground"
-                }
-              >
-                {u.is_active ? "Activo" : "Desactivado"}
-              </span>
-            ),
-          },
-          {
-            header: "",
-            cell: (u) => <CollaboratorRowActions userId={u.id} name={u.name} />,
-            className: "text-right",
-          },
-        ]}
-      />
+      <CollaboratorList users={users} />
     </div>
   );
 }
