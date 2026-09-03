@@ -6,7 +6,11 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { adminNav } from "@/config/nav";
 import { requireRole } from "@/lib/auth/session";
 
-export default async function AdminLayout({ children }: { children: ReactNode }) {
+export default async function AdminLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const session = await requireRole("admin");
 
   return (
@@ -18,10 +22,18 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         } as CSSProperties
       }
     >
-      <AppSidebar variant="inset" items={adminNav} sectionLabel="Admin" session={session} />
+      <AppSidebar
+        variant="inset"
+        items={adminNav}
+        sectionLabel="Admin"
+        session={session}
+        accountHref="/admin/conta"
+      />
       <SidebarInset>
         <SiteHeader title="Administração da Plataforma" />
-        <div className="flex-1 overflow-y-auto bg-muted/20 p-4 md:p-8">{children}</div>
+        <div className="flex-1 overflow-y-auto bg-muted/20 p-4 md:p-8">
+          {children}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

@@ -39,6 +39,11 @@ const TABLES = {
     maintenance: { label: "Manutenção", tone: "warning" },
     inactive: { label: "Inactivo", tone: "neutral" },
   },
+  boarding: {
+    allowed: { label: "Permitido", tone: "positive" },
+    already_boarded: { label: "Já embarcou", tone: "warning" },
+    invalid: { label: "Inválido", tone: "negative" },
+  },
 } satisfies Record<string, Record<string, StatusMeta>>;
 
 const TONE_CLASSES: Record<Tone, string> = {
@@ -71,7 +76,7 @@ export function StatusBadge({ domain, status, className }: StatusBadgeProps) {
         meta.tone === "negative" && "ring-destructive/20",
         meta.tone === "info" && "ring-sky-500/20",
         meta.tone === "neutral" && "ring-border",
-        className
+        className,
       )}
     >
       {meta.label}

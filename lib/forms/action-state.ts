@@ -16,7 +16,8 @@ export function actionErrorState(error: unknown): ActionState {
   if (error instanceof ApiError) {
     return {
       fieldErrors: error.fieldErrors,
-      formError: error.fieldErrors ? undefined : error.message,
+      // `info.msg` traduz o status/detail (403 sem permissão ≠ empresa por aprovar).
+      formError: error.fieldErrors ? undefined : error.info.msg,
     };
   }
 

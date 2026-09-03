@@ -3,14 +3,16 @@ import { notFound } from "next/navigation";
 import { IconArrowLeft } from "@tabler/icons-react";
 
 import { AddRouteStopForm } from "./add-stop-form";
-import { CompanyBlocked } from "@/components/feedback/company-blocked";
+import { ApiErrorState } from "@/components/feedback/api-error-state";
 import { SimpleTable } from "@/components/tables/simple-table";
 import { getCities, getCompanyRoutes } from "@/lib/api/routes";
 import { formatCurrency } from "@/lib/format";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { can, requirePermission } from "@/lib/auth/session";
 
-export default async function RotaDetalhePage({ params }: PageProps<"/empresa/rotas/[routeId]">) {
+export default async function RotaDetalhePage({
+  params,
+}: PageProps<"/empresa/rotas/[routeId]">) {
   await requirePermission(PERMISSIONS.routeRead);
   const { routeId } = await params;
   const canAddStop = await can(PERMISSIONS.routeAddStop);
@@ -18,13 +20,15 @@ export default async function RotaDetalhePage({ params }: PageProps<"/empresa/ro
   let routes;
   try {
     routes = await getCompanyRoutes();
-  } catch {
+  } catch (error) {
     return (
       <div className="flex flex-col gap-6 animate-fade-in">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-foreground">Rota</h2>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
+            Rota
+          </h2>
         </div>
-        <CompanyBlocked />
+        <ApiErrorState error={error} />
       </div>
     );
   }
@@ -49,23 +53,32 @@ export default async function RotaDetalhePage({ params }: PageProps<"/empresa/ro
         </h2>
         <p className="text-sm text-muted-foreground">
           {route.origin_province} · {route.destination_province} — preço base{" "}
-          <span className="font-medium text-foreground">{formatCurrency(route.total_price)}</span> ·{" "}
-          {route.is_active ? "Activa" : "Inactiva"}
+          <span className="font-medium text-foreground">
+            {formatCurrency(route.total_price)}
+          </span>{" "}
+          · {route.is_active ? "Activa" : "Inactiva"}
         </p>
       </div>
 
       <div className="flex flex-col gap-3">
-        <h3 className="text-sm font-semibold text-foreground">Paragens intermédias</h3>
+        <h3 className="text-sm font-semibold text-foreground">
+          Paragens intermédias
+        </h3>
         <SimpleTable
           rows={route.stops}
           rowKey={(stop) => stop.city}
           emptyTitle="Sem paragens intermédias"
           emptyDescription="Esta rota é directa entre origem e destino."
           columns={[
-            { header: "Cidade", cell: (s) => <span className="font-medium">{s.city}</span> },
+            {
+              header: "Cidade",
+              cell: (s) => <span className="font-medium">{s.city}</span>,
+            },
             {
               header: "Preço acumulado",
-              cell: (s) => <span className="tabular-nums">{formatCurrency(s.price)}</span>,
+              cell: (s) => (
+                <span className="tabular-nums">{formatCurrency(s.price)}</span>
+              ),
               className: "text-right",
             },
           ]}
@@ -74,7 +87,9 @@ export default async function RotaDetalhePage({ params }: PageProps<"/empresa/ro
 
       {canAddStop ? (
         <div className="flex flex-col gap-3">
-          <h3 className="text-sm font-semibold text-foreground">Adicionar paragem</h3>
+          <h3 className="text-sm font-semibold text-foreground">
+            Adicionar paragem
+          </h3>
           <AddRouteStopForm routeId={route.id} cities={cities} />
         </div>
       ) : null}

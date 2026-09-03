@@ -1,5 +1,5 @@
 import { CreateDriverForm } from "./create-driver-form";
-import { CompanyBlocked } from "@/components/feedback/company-blocked";
+import { ApiErrorState } from "@/components/feedback/api-error-state";
 import { getCompanyUsers } from "@/lib/api/companies";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { requirePermission } from "@/lib/auth/session";
@@ -10,13 +10,15 @@ export default async function NovoMotoristaPage() {
   let users;
   try {
     users = await getCompanyUsers();
-  } catch {
+  } catch (error) {
     return (
       <div className="flex max-w-md flex-col gap-6 animate-fade-in">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-foreground">Adicionar motorista</h2>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
+            Adicionar motorista
+          </h2>
         </div>
-        <CompanyBlocked />
+        <ApiErrorState error={error} />
       </div>
     );
   }
@@ -26,10 +28,12 @@ export default async function NovoMotoristaPage() {
   return (
     <div className="flex max-w-md flex-col gap-6 animate-fade-in">
       <div>
-        <h2 className="text-xl font-bold tracking-tight text-foreground">Adicionar motorista</h2>
+        <h2 className="text-xl font-bold tracking-tight text-foreground">
+          Adicionar motorista
+        </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          O motorista tem de ter primeiro uma conta de colaborador. Cria-a em Colaboradores e depois
-          associa-a aqui.
+          O motorista tem de ter primeiro uma conta de colaborador. Cria-a em
+          Colaboradores e depois associa-a aqui.
         </p>
       </div>
       <CreateDriverForm users={activeUsers} />

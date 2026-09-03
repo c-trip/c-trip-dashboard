@@ -10,7 +10,10 @@ export type IconName =
   | "creditCard"
   | "building"
   | "clipboard"
-  | "shield";
+  | "shield"
+  | "ticket"
+  | "scan"
+  | "report";
 
 export interface NavItem {
   href: string;
@@ -22,9 +25,24 @@ export interface NavItem {
 
 export const empresaNav: NavItem[] = [
   { href: "/empresa", label: "Visão geral", icon: "dashboard" },
-  { href: "/empresa/rotas", label: "Rotas", icon: "route", permission: PERMISSIONS.routeRead },
-  { href: "/empresa/horarios", label: "Horários", icon: "calendar", permission: PERMISSIONS.scheduleRead },
-  { href: "/empresa/frota/autocarros", label: "Autocarros", icon: "bus", permission: PERMISSIONS.busRead },
+  {
+    href: "/empresa/rotas",
+    label: "Rotas",
+    icon: "route",
+    permission: PERMISSIONS.routeRead,
+  },
+  {
+    href: "/empresa/horarios",
+    label: "Horários",
+    icon: "calendar",
+    permission: PERMISSIONS.scheduleRead,
+  },
+  {
+    href: "/empresa/frota/autocarros",
+    label: "Autocarros",
+    icon: "bus",
+    permission: PERMISSIONS.busRead,
+  },
   {
     href: "/empresa/frota/motoristas",
     label: "Motoristas",
@@ -38,6 +56,18 @@ export const empresaNav: NavItem[] = [
     permission: PERMISSIONS.taskCreate,
   },
   {
+    href: "/empresa/balcao",
+    label: "Balcão",
+    icon: "ticket",
+    permission: PERMISSIONS.bookingSell,
+  },
+  {
+    href: "/empresa/embarque",
+    label: "Embarque",
+    icon: "scan",
+    permission: PERMISSIONS.boardingValidate,
+  },
+  {
     href: "/empresa/colaboradores",
     label: "Colaboradores",
     icon: "userCog",
@@ -48,6 +78,12 @@ export const empresaNav: NavItem[] = [
     label: "Pagamentos",
     icon: "creditCard",
     permission: PERMISSIONS.paymentReadCompany,
+  },
+  {
+    href: "/empresa/relatorios",
+    label: "Fluxo de caixa",
+    icon: "report",
+    permission: PERMISSIONS.financeReportDaily,
   },
 ];
 
@@ -69,6 +105,12 @@ export const adminNav: NavItem[] = [
     href: "/admin/pagamentos",
     label: "Pagamentos",
     icon: "creditCard",
+    permission: PERMISSIONS.paymentReadAll,
+  },
+  {
+    href: "/admin/relatorios",
+    label: "Fluxo de caixa",
+    icon: "report",
     permission: PERMISSIONS.paymentReadAll,
   },
   {

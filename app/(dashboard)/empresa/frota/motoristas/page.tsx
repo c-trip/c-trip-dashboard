@@ -2,7 +2,7 @@ import Link from "next/link";
 import { IconPlus } from "@tabler/icons-react";
 
 import { DriverRowActions } from "./driver-row-actions";
-import { CompanyBlocked } from "@/components/feedback/company-blocked";
+import { ApiErrorState } from "@/components/feedback/api-error-state";
 import { SimpleTable } from "@/components/tables/simple-table";
 import { buttonVariants } from "@/components/ui/button";
 import { getDrivers } from "@/lib/api/fleet";
@@ -17,13 +17,15 @@ export default async function MotoristasPage() {
   let drivers;
   try {
     drivers = await getDrivers();
-  } catch {
+  } catch (error) {
     return (
       <div className="flex flex-col gap-6 animate-fade-in">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-foreground">Motoristas</h2>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
+            Motoristas
+          </h2>
         </div>
-        <CompanyBlocked />
+        <ApiErrorState error={error} />
       </div>
     );
   }
@@ -32,7 +34,9 @@ export default async function MotoristasPage() {
     <div className="flex flex-col gap-6 animate-fade-in">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-foreground">Motoristas</h2>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
+            Motoristas
+          </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Associados a contas de colaborador já existentes.
           </p>
@@ -53,19 +57,30 @@ export default async function MotoristasPage() {
         emptyTitle="Ainda não há motoristas"
         emptyDescription="Cria primeiro a conta em Colaboradores; depois associa-a aqui como motorista."
         columns={[
-          { header: "Nome", cell: (d) => <span className="font-medium">{d.name}</span> },
+          {
+            header: "Nome",
+            cell: (d) => <span className="font-medium">{d.name}</span>,
+          },
           { header: "Telefone", cell: (d) => d.phone ?? "—" },
           {
             header: "Disponibilidade",
             cell: (d) => (
-              <span className={d.available ? "text-emerald-600 dark:text-emerald-400 font-medium" : "text-muted-foreground"}>
+              <span
+                className={
+                  d.available
+                    ? "text-emerald-600 dark:text-emerald-400 font-medium"
+                    : "text-muted-foreground"
+                }
+              >
                 {d.available ? "Disponível" : "Indisponível"}
               </span>
             ),
           },
           {
             header: "",
-            cell: (d) => <DriverRowActions driverId={d.id} available={d.available} />,
+            cell: (d) => (
+              <DriverRowActions driverId={d.id} available={d.available} />
+            ),
             className: "text-right",
           },
         ]}

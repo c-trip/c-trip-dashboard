@@ -2,7 +2,7 @@ import Link from "next/link";
 import { IconPlus } from "@tabler/icons-react";
 
 import { RouteRowActions } from "./route-row-actions";
-import { CompanyBlocked } from "@/components/feedback/company-blocked";
+import { ApiErrorState } from "@/components/feedback/api-error-state";
 import { SimpleTable } from "@/components/tables/simple-table";
 import { buttonVariants } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/format";
@@ -21,13 +21,15 @@ export default async function RotasPage() {
   let routes;
   try {
     routes = await getCompanyRoutes();
-  } catch {
+  } catch (error) {
     return (
       <div className="flex flex-col gap-6 animate-fade-in">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-foreground">Rotas</h2>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
+            Rotas
+          </h2>
         </div>
-        <CompanyBlocked />
+        <ApiErrorState error={error} />
       </div>
     );
   }
@@ -36,12 +38,17 @@ export default async function RotasPage() {
     <div className="flex flex-col gap-6 animate-fade-in">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-foreground">Rotas</h2>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
+            Rotas
+          </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Ligações entre cidades que a tua empresa opera.
           </p>
         </div>
-        <Link href="/empresa/rotas/nova" className={cn(buttonVariants({ variant: "default" }))}>
+        <Link
+          href="/empresa/rotas/nova"
+          className={cn(buttonVariants({ variant: "default" }))}
+        >
           <IconPlus size={16} data-icon="inline-start" />
           Nova rota
         </Link>
@@ -55,18 +62,46 @@ export default async function RotasPage() {
           {
             header: "Origem",
             cell: (r) => (
-              <Link href={`/empresa/rotas/${r.id}`} className="font-medium text-primary hover:underline">
+              <Link
+                href={`/empresa/rotas/${r.id}`}
+                className="font-medium text-primary hover:underline"
+              >
                 {r.origin_city}
               </Link>
             ),
           },
-          { header: "Destino", cell: (r) => <span className="font-medium">{r.destination_city}</span> },
-          { header: "Preço base", cell: (r) => <span className="tabular-nums font-medium">{formatCurrency(r.total_price)}</span> },
-          { header: "Paragens", cell: (r) => <span className="tabular-nums">{r.stops.length > 0 ? String(r.stops.length) : "—"}</span> },
+          {
+            header: "Destino",
+            cell: (r) => (
+              <span className="font-medium">{r.destination_city}</span>
+            ),
+          },
+          {
+            header: "Preço base",
+            cell: (r) => (
+              <span className="tabular-nums font-medium">
+                {formatCurrency(r.total_price)}
+              </span>
+            ),
+          },
+          {
+            header: "Paragens",
+            cell: (r) => (
+              <span className="tabular-nums">
+                {r.stops.length > 0 ? String(r.stops.length) : "—"}
+              </span>
+            ),
+          },
           {
             header: "Estado",
             cell: (r) => (
-              <span className={r.is_active ? "text-emerald-600 dark:text-emerald-400 font-medium" : "text-muted-foreground"}>
+              <span
+                className={
+                  r.is_active
+                    ? "text-emerald-600 dark:text-emerald-400 font-medium"
+                    : "text-muted-foreground"
+                }
+              >
                 {r.is_active ? "Activa" : "Inactiva"}
               </span>
             ),

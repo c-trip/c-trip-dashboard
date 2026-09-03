@@ -1,12 +1,10 @@
-"use client"
+"use client";
 
-import { useRouter } from "next/navigation"
-import { useTransition } from "react"
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 
-import {
-  Avatar,
-  AvatarFallback,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,40 +13,42 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import { IconDotsVertical, IconLogout } from "@tabler/icons-react"
+} from "@/components/ui/sidebar";
+import { IconDotsVertical, IconLock, IconLogout } from "@tabler/icons-react";
 
 export function NavUser({
   user,
+  accountHref,
 }: {
   user: {
-    name: string
-    email: string
-  }
+    name: string;
+    email: string;
+  };
+  accountHref?: string;
 }) {
-  const { isMobile } = useSidebar()
-  const router = useRouter()
-  const [pending, startTransition] = useTransition()
+  const { isMobile } = useSidebar();
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
 
   const initials = user.name
     .split(" ")
     .map((n) => n[0])
     .slice(0, 2)
     .join("")
-    .toUpperCase()
+    .toUpperCase();
 
   function handleLogout() {
     startTransition(async () => {
-      await fetch("/api/auth/logout", { method: "POST" })
-      router.push("/login")
-      router.refresh()
-    })
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/login");
+      router.refresh();
+    });
   }
 
   return (
@@ -97,6 +97,12 @@ export function NavUser({
               </DropdownMenuLabel>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
+            {accountHref ? (
+              <DropdownMenuItem render={<Link href={accountHref} />}>
+                <IconLock />
+                Alterar palavra-passe
+              </DropdownMenuItem>
+            ) : null}
             <DropdownMenuItem disabled={pending} onClick={handleLogout}>
               <IconLogout />
               Sair
@@ -105,5 +111,5 @@ export function NavUser({
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }
