@@ -1,9 +1,21 @@
-import Link from "next/link";
+import { unstable_rethrow } from "next/navigation";
 
+import {
+  BalcaoTripList,
+  type BalcaoTrip,
+} from "@/components/operator/balcao-trip-list";
 import { CompanyBlocked } from "@/components/feedback/company-blocked";
 import { DateFilter } from "@/components/feedback/date-filter";
-import { SimpleTable } from "@/components/tables/simple-table";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { getOperatorSchedules } from "@/lib/api/operator";
+import { getCompanyPaymentsSummary } from "@/lib/api/payments";
+import { getCompanyRoutes } from "@/lib/api/routes";
+import { formatCurrency } from "@/lib/format";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { requirePermission } from "@/lib/auth/session";
 
@@ -11,11 +23,27 @@ function str(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
 }
 
+function ymd(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
+    date.getDate(),
+  ).padStart(2, "0")}`;
+}
+
+async function safe<T>(promise: Promise<T>, fallback: T): Promise<T> {
+  try {
+    return await promise;
+  } catch (error) {
+    unstable_rethrow(error);
+    return fallback;
+  }
+}
+
 export default async function BalcaoPage({
   searchParams,
 }: PageProps<"/empresa/balcao">) {
   await requirePermission(PERMISSIONS.bookingSell);
   const date = str((await searchParams)?.date);
+  const today = ymd(new Date());
 
   let schedules;
   try {
@@ -33,59 +61,50 @@ export default async function BalcaoPage({
     );
   }
 
+  const [routes, todaySummary] = await Promise.all([
+    safe(getCompanyRoutes(), []),
+    safe(getCompanyPaymentsSummary({ date_from: today, date_to: today }), null),
+  ]);
+
+  const priceByRoute = new Map(
+    routes.map((route) => [
+      `${route.origin_city}→${route.destination_city}`,
+      route.total_price,
+    ]),
+  );
+
+  const trips: BalcaoTrip[] = schedules.map((s) => ({
+    ...s,
+    price: priceByRoute.get(`${s.origin}→${s.destination}`) ?? null,
+  }));
+
   return (
     <div className="flex flex-col gap-6 animate-fade-in">
-      <div>
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Balcão
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Viagens com lugares à venda. Escolhe uma para vender um bilhete ao
-          balcão.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
+            Balcão
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Viagens com lugares à venda. Escolhe uma para vender um bilhete.
+          </p>
+        </div>
+        {todaySummary ? (
+          <Card className="gap-1 py-3">
+            <CardHeader className="px-4">
+              <CardDescription>Recebido hoje (empresa)</CardDescription>
+              <CardTitle className="text-lg font-semibold tabular-nums">
+                {formatCurrency(todaySummary.total_confirmed)}
+              </CardTitle>
+              <p className="text-xs text-muted-foreground tabular-nums">
+                {todaySummary.count_confirmed} bilhete(s)
+              </p>
+            </CardHeader>
+          </Card>
+        ) : null}
       </div>
       <DateFilter initial={date} label="Data de partida" />
-      <SimpleTable
-        rows={schedules}
-        rowKey={(s) => s.schedule_id}
-        emptyTitle="Nenhuma viagem aberta"
-        emptyDescription="Não há viagens com embarque aberto para a data escolhida."
-        columns={[
-          {
-            header: "Rota",
-            cell: (s) => (
-              <span className="font-medium">
-                {s.origin} → {s.destination}
-              </span>
-            ),
-          },
-          {
-            header: "Partida",
-            cell: (s) => `${s.departure_date} · ${s.departure_time}`,
-          },
-          {
-            header: "Lugares",
-            cell: (s) => (
-              <span className="tabular-nums">{`${s.available_seats}/${s.total_seats} livres`}</span>
-            ),
-          },
-          {
-            header: "",
-            cell: (s) =>
-              s.available_seats > 0 ? (
-                <Link
-                  href={`/empresa/balcao/${s.schedule_id}`}
-                  className="text-primary hover:underline"
-                >
-                  Vender
-                </Link>
-              ) : (
-                <span className="text-xs text-muted-foreground">Esgotada</span>
-              ),
-            className: "text-right",
-          },
-        ]}
-      />
+      <BalcaoTripList trips={trips} />
     </div>
   );
 }

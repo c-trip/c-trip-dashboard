@@ -179,21 +179,30 @@
     transform: translateY(0);
   }
 }
-/* Impressão de talões — só o elemento marcado com `data-print-ticket` sai no papel. */
+/* Impressão de talões — só o elemento marcado sai no papel. */
 @media print {
   body * {
     visibility: hidden;
   }
   [data-print-ticket],
-  [data-print-ticket] * {
+  [data-print-ticket] *,
+  [data-print-receipt],
+  [data-print-receipt] * {
     visibility: visible;
   }
-  [data-print-ticket] {
+  [data-print-ticket],
+  [data-print-receipt] {
     position: absolute;
     top: 0;
     left: 0;
-    width: 72mm;
     border: 0 !important;
     box-shadow: none !important;
+  }
+  [data-print-ticket] {
+    width: 72mm;
+  }
+  [data-print-receipt] {
+    width: 80mm;
+    padding: 4mm;
   }
 }

@@ -10,6 +10,13 @@ import { actionErrorState, type ActionState } from "@/lib/forms/action-state";
 
 export interface SellActionState extends ActionState {
   sale?: OperatorSaleResponse;
+  /** Dados que a resposta da API não devolve mas o talão precisa. */
+  meta?: {
+    price: number;
+    method: "cash" | "pos" | "multicaixa_express";
+    phone?: string;
+    doc?: string;
+  };
 }
 
 const sellSchema = z.object({
@@ -64,5 +71,14 @@ export async function sellAction(
   }
 
   revalidatePath(`/empresa/balcao/${scheduleId}`);
-  return { success: true, sale };
+  return {
+    success: true,
+    sale,
+    meta: {
+      price: parsed.data.total_price,
+      method: parsed.data.payment_method,
+      phone: parsed.data.passenger_phone || undefined,
+      doc: parsed.data.passenger_id_doc || undefined,
+    },
+  };
 }

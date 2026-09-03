@@ -9,9 +9,13 @@ import { requirePermission } from "@/lib/auth/session";
 
 export default async function BalcaoVendaPage({
   params,
+  searchParams,
 }: PageProps<"/empresa/balcao/[scheduleId]">) {
   await requirePermission(PERMISSIONS.bookingSell);
   const { scheduleId } = await params;
+  const priceParam = (await searchParams)?.price;
+  const defaultPrice =
+    Number(Array.isArray(priceParam) ? priceParam[0] : priceParam) || undefined;
 
   let detail, seats;
   try {
@@ -59,6 +63,7 @@ export default async function BalcaoVendaPage({
         seats={seats}
         route={route}
         departure={departure}
+        defaultPrice={defaultPrice}
       />
     </div>
   );

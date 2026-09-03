@@ -2,9 +2,11 @@
 
 import { useActionState } from "react";
 
+import Link from "next/link";
+
 import { sellAction, type SellActionState } from "./actions";
 import { FormError, FormField } from "@/components/forms/form-field";
-import { QrTicket } from "@/components/operator/qr-ticket";
+import { SaleReceipt } from "@/components/operator/sale-receipt";
 import { SeatMap } from "@/components/schedules/seat-map";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -20,6 +22,7 @@ interface SellFormProps {
   seats: ScheduleSeats;
   route: string;
   departure: string;
+  defaultPrice?: number;
 }
 
 export function SellForm({
@@ -27,6 +30,7 @@ export function SellForm({
   seats,
   route,
   departure,
+  defaultPrice,
 }: SellFormProps) {
   const boundAction = sellAction.bind(null, scheduleId);
   const [state, action, pending] = useActionState<SellActionState, FormData>(
@@ -34,21 +38,35 @@ export function SellForm({
     initialActionState,
   );
 
-  if (state.sale) {
+  if (state.sale && state.meta) {
     return (
-      <div className="flex flex-col gap-4">
-        <p className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-4 py-3 text-sm font-medium text-emerald-700 dark:text-emerald-400">
-          Bilhete emitido. Entrega o QR ao passageiro.
+      <div className="flex flex-col gap-4 print:gap-0">
+        <p className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-4 py-3 text-sm font-medium text-emerald-700 dark:text-emerald-400 print:hidden">
+          Bilhete emitido. Imprime o talão e entrega ao passageiro.
         </p>
-        <QrTicket
-          qrImage={state.sale.qr_image}
-          qrHash={state.sale.qr_hash}
-          passengerName={state.sale.passenger_name}
-          seatNumber={state.sale.seat_number}
-          route={`${state.sale.origin} → ${state.sale.destination}`}
-          departure={`${state.sale.departure_date} · ${state.sale.departure_time}`}
-          validUntil={state.sale.valid_until}
+        <SaleReceipt
+          sale={state.sale}
+          price={state.meta.price}
+          method={state.meta.method}
+          phone={state.meta.phone}
+          doc={state.meta.doc}
         />
+        <div className="flex flex-wrap gap-2 print:hidden">
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => window.location.reload()}
+          >
+            Nova venda nesta viagem
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            render={<Link href="/empresa/balcao" />}
+          >
+            Voltar às viagens
+          </Button>
+        </div>
       </div>
     );
   }
@@ -127,6 +145,7 @@ export function SellForm({
                 min={1}
                 step="0.01"
                 required
+                defaultValue={defaultPrice}
               />
             </FormField>
             <FormField
