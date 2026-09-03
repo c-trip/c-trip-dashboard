@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import type { DateRange } from "react-day-picker";
+import { format, parseISO } from "date-fns";
+import { pt } from "date-fns/locale";
 import {
   IconCalendarEvent,
   IconCheck,
@@ -10,7 +13,7 @@ import {
 } from "@tabler/icons-react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
@@ -100,8 +103,14 @@ export function PaymentsFilterBar({
   const to = initial.date_to ?? "";
   const method = initial.method ?? "";
 
-  const [draftFrom, setDraftFrom] = useState(from);
-  const [draftTo, setDraftTo] = useState(to);
+  const [range, setRange] = useState<DateRange | undefined>(
+    from || to
+      ? {
+          from: from ? parseISO(from) : undefined,
+          to: to ? parseISO(to) : undefined,
+        }
+      : undefined,
+  );
 
   function push(next: PaymentsFilterValues) {
     const params = new URLSearchParams();
@@ -123,63 +132,56 @@ export function PaymentsFilterBar({
           {labelForRange(from, to)}
           <IconChevronDown size={14} className="text-muted-foreground" />
         </PopoverTrigger>
-        <PopoverContent className="w-64">
-          <div className="flex flex-col gap-1">
-            {PRESETS.map((p) => {
-              const r = rangeFor(p.key);
-              const active = r.from === from && r.to === to;
-              return (
-                <button
-                  key={p.key}
-                  type="button"
-                  onClick={() =>
-                    push({ date_from: r.from, date_to: r.to, method })
-                  }
-                  className={cn(
-                    "flex items-center justify-between rounded-lg px-2.5 py-1.5 text-sm transition-colors hover:bg-muted",
-                    active && "font-medium text-primary",
-                  )}
-                >
-                  {p.label}
-                  {active ? <IconCheck size={15} /> : null}
-                </button>
-              );
-            })}
-          </div>
-          <div className="mt-3 flex flex-col gap-2 border-t border-border pt-3">
-            <p className="text-xs font-medium text-muted-foreground">
-              Intervalo personalizado
-            </p>
-            <div className="flex items-center gap-2">
-              <Input
-                type="date"
-                aria-label="De"
-                value={draftFrom}
-                max={draftTo || undefined}
-                onChange={(e) => setDraftFrom(e.target.value)}
-                className="h-9"
-              />
-              <Input
-                type="date"
-                aria-label="Até"
-                value={draftTo}
-                min={draftFrom || undefined}
-                onChange={(e) => setDraftTo(e.target.value)}
-                className="h-9"
-              />
+        <PopoverContent className="w-auto p-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex min-w-40 flex-col gap-1">
+              {PRESETS.map((p) => {
+                const r = rangeFor(p.key);
+                const active = r.from === from && r.to === to;
+                return (
+                  <button
+                    key={p.key}
+                    type="button"
+                    onClick={() =>
+                      push({ date_from: r.from, date_to: r.to, method })
+                    }
+                    className={cn(
+                      "flex items-center justify-between rounded-lg px-2.5 py-1.5 text-sm transition-colors hover:bg-muted",
+                      active && "font-medium text-primary",
+                    )}
+                  >
+                    {p.label}
+                    {active ? <IconCheck size={15} /> : null}
+                  </button>
+                );
+              })}
             </div>
-            <Button
-              type="button"
-              size="sm"
-              disabled={
-                !draftFrom || !draftTo || (draftFrom === from && draftTo === to)
-              }
-              onClick={() =>
-                push({ date_from: draftFrom, date_to: draftTo, method })
-              }
-            >
-              Aplicar intervalo
-            </Button>
+            <div className="flex flex-col gap-2 border-t border-border pt-2 sm:border-l sm:border-t-0 sm:pl-3 sm:pt-0">
+              <Calendar
+                mode="range"
+                locale={pt}
+                numberOfMonths={1}
+                selected={range}
+                onSelect={setRange}
+                defaultMonth={range?.from}
+              />
+              <Button
+                type="button"
+                size="sm"
+                disabled={!range?.from || !range?.to}
+                onClick={() =>
+                  range?.from &&
+                  range?.to &&
+                  push({
+                    date_from: format(range.from, "yyyy-MM-dd"),
+                    date_to: format(range.to, "yyyy-MM-dd"),
+                    method,
+                  })
+                }
+              >
+                Aplicar intervalo
+              </Button>
+            </div>
           </div>
         </PopoverContent>
       </Popover>
