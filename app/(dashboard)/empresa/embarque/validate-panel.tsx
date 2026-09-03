@@ -1,13 +1,14 @@
 "use client";
 
 import { useActionState, useRef, useState, useTransition } from "react";
+import { IconArrowRight } from "@tabler/icons-react";
 
 import {
   recordAction,
   validateAction,
   type ValidateActionState,
 } from "./actions";
-import { FormError, FormField } from "@/components/forms/form-field";
+import { FormError } from "@/components/forms/form-field";
 import { StatusBadge } from "@/components/feedback/status-badge";
 import { QrScanner } from "@/components/operator/qr-scanner";
 import { Button } from "@/components/ui/button";
@@ -47,57 +48,82 @@ export function ValidatePanel({ scheduleId }: { scheduleId?: string }) {
   }
 
   return (
-    <Card>
-      <CardContent className="flex flex-col gap-5">
-        <form ref={formRef} action={action} className="flex flex-col gap-4">
-          <FormError message={state.formError} />
-          {scheduleId ? (
-            <input type="hidden" name="schedule_id" value={scheduleId} />
-          ) : null}
+    <div className="mx-auto flex w-full max-w-md flex-col gap-4">
+      <Card>
+        <CardContent className="flex flex-col gap-4">
           <QrScanner onScan={handleScan} />
-          <FormField
-            htmlFor="qr_hash"
-            label="Ou introduz o código do QR"
-            error={state.fieldErrors?.qr_hash}
-          >
-            <Input
-              ref={hashRef}
-              id="qr_hash"
-              name="qr_hash"
-              placeholder="32 caracteres hexadecimais"
-              autoComplete="off"
-            />
-          </FormField>
-          <Button type="submit" disabled={pending} className="w-fit">
-            {pending ? "A validar…" : "Validar"}
-          </Button>
-        </form>
 
-        {result ? (
-          <div className="flex flex-col gap-3 rounded-lg border border-border p-4">
-            <div className="flex items-center justify-between gap-3">
-              <StatusBadge domain="boarding" status={result.status} />
-              {result.first_boarded_at ? (
-                <span className="text-xs text-muted-foreground">
-                  1.º embarque: {result.first_boarded_at}
-                </span>
+          <form
+            ref={formRef}
+            action={action}
+            className="flex items-start gap-2"
+          >
+            {scheduleId ? (
+              <input type="hidden" name="schedule_id" value={scheduleId} />
+            ) : null}
+            <div className="flex-1">
+              <Input
+                ref={hashRef}
+                name="qr_hash"
+                placeholder="Código do QR (32 caracteres)"
+                autoComplete="off"
+                aria-invalid={Boolean(state.fieldErrors?.qr_hash)}
+              />
+              {state.fieldErrors?.qr_hash ? (
+                <p className="mt-1 text-xs font-medium text-destructive">
+                  {state.fieldErrors.qr_hash[0]}
+                </p>
               ) : null}
             </div>
+            <Button
+              type="submit"
+              size="icon"
+              disabled={pending}
+              title="Validar"
+            >
+              <IconArrowRight size={18} />
+            </Button>
+          </form>
+
+          <FormError message={state.formError} />
+        </CardContent>
+      </Card>
+
+      {result ? (
+        <Card
+          className={
+            result.status === "allowed"
+              ? "border-emerald-500/30"
+              : result.status === "already_boarded"
+                ? "border-amber-500/30"
+                : "border-destructive/30"
+          }
+        >
+          <CardContent className="flex flex-col items-center gap-4 text-center">
+            <StatusBadge domain="boarding" status={result.status} />
+
             {result.status === "invalid" ? (
               <p className="text-sm text-destructive">
                 {result.reason || "QR não reconhecido."}
               </p>
             ) : (
-              <dl className="grid grid-cols-3 gap-x-3 gap-y-1 text-sm">
-                <dt className="text-muted-foreground">Passageiro</dt>
-                <dd className="col-span-2 font-medium">{result.passenger}</dd>
-                <dt className="text-muted-foreground">Lugar</dt>
-                <dd className="col-span-2 font-medium tabular-nums">
-                  {result.seat_number}
-                </dd>
-                <dt className="text-muted-foreground">Destino</dt>
-                <dd className="col-span-2 font-medium">{result.destination}</dd>
-              </dl>
+              <div className="flex flex-col gap-1">
+                <p className="text-lg font-bold text-foreground">
+                  {result.passenger}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Lugar{" "}
+                  <span className="font-semibold tabular-nums text-foreground">
+                    {result.seat_number}
+                  </span>{" "}
+                  · {result.destination}
+                </p>
+                {result.first_boarded_at ? (
+                  <p className="text-xs text-muted-foreground">
+                    1.º embarque: {result.first_boarded_at}
+                  </p>
+                ) : null}
+              </div>
             )}
 
             {recordError ? (
@@ -105,7 +131,7 @@ export function ValidatePanel({ scheduleId }: { scheduleId?: string }) {
             ) : null}
 
             {boarded ? (
-              <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+              <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
                 Embarque registado às {boarded}.
               </p>
             ) : result.status === "allowed" ? (
@@ -113,14 +139,14 @@ export function ValidatePanel({ scheduleId }: { scheduleId?: string }) {
                 type="button"
                 onClick={handleRecord}
                 disabled={recording}
-                className="w-fit"
+                className="w-full"
               >
                 {recording ? "A registar…" : "Registar embarque"}
               </Button>
             ) : null}
-          </div>
-        ) : null}
-      </CardContent>
-    </Card>
+          </CardContent>
+        </Card>
+      ) : null}
+    </div>
   );
 }

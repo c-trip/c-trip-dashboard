@@ -1,7 +1,6 @@
-import Link from "next/link";
-
 import { ValidatePanel } from "./validate-panel";
 import { ApiErrorState } from "@/components/feedback/api-error-state";
+import { EmbarqueNav } from "@/components/operator/embarque-nav";
 import { SchedulePicker } from "@/components/operator/schedule-picker";
 import { getOperatorSchedules } from "@/lib/api/operator";
 import { PERMISSIONS } from "@/lib/auth/permissions";
@@ -36,29 +35,24 @@ export default async function EmbarquePage({
   const selected = schedules.find((s) => s.schedule_id === scheduleId);
 
   return (
-    <div className="flex max-w-lg flex-col gap-6 animate-fade-in">
+    <div className="flex max-w-2xl flex-col gap-6 animate-fade-in">
       <div>
         <h2 className="text-xl font-bold tracking-tight text-foreground">
           Embarque
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Valida o QR do passageiro e regista o embarque. Fixa uma viagem para
-          recusar bilhetes de outra.
+          {selected
+            ? `${selected.origin} → ${selected.destination} · ${selected.departure_date} ${selected.departure_time}`
+            : "Escolhe a viagem para recusar bilhetes de outra."}
         </p>
       </div>
 
-      <SchedulePicker schedules={schedules} selected={scheduleId} />
+      <div className="flex flex-wrap items-center gap-2">
+        <SchedulePicker schedules={schedules} selected={scheduleId} />
+        <EmbarqueNav scheduleId={scheduleId} />
+      </div>
 
       <ValidatePanel scheduleId={scheduleId} />
-
-      {selected ? (
-        <Link
-          href={`/empresa/embarque/${selected.schedule_id}/manifesto`}
-          className="text-sm text-primary hover:underline"
-        >
-          Ver manifesto de {selected.origin} → {selected.destination}
-        </Link>
-      ) : null}
     </div>
   );
 }
