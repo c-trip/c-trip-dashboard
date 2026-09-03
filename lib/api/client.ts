@@ -63,23 +63,38 @@ const axiosInstance: AxiosInstance = axios.create({
 // `apiFetch` que decide (e só ele tem acesso ao cookie para o limpar).
 axiosInstance.interceptors.response.use(
   (response) => response,
-  (error: unknown) => {
+  // `async` de propósito: `parseApiError` devolve uma Promise. Se a rejeitássemos
+  // sem `await`, o resto da app receberia a Promise em vez do `ApiError` — e
+  // `error instanceof ApiError` seria sempre falso (nunca mostrava o 403 real,
+  // nunca fazia logout no 401).
+  async (error: unknown) => {
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError;
       if (axiosError.response) {
-        return Promise.reject(parseApiError(axiosError.response));
+        const parsed = await parseApiError(axiosError.response);
+        if (process.env.NODE_ENV !== "production") {
+          console.error(
+            `[api] ${axiosError.config?.method?.toUpperCase()} ${axiosError.config?.url} → ${parsed.status}`,
+            parsed.detail ?? parsed.message,
+          );
+        }
+        throw parsed;
+      }
+      if (process.env.NODE_ENV !== "production") {
+        console.error(
+          `[api] ${axiosError.config?.method?.toUpperCase()} ${axiosError.config?.url} → sem resposta`,
+          axiosError.code,
+        );
       }
       // Erro de rede / timeout — sem resposta do servidor.
-      return Promise.reject(
-        new ApiError(
-          0,
-          axiosError.code === "ECONNABORTED"
-            ? "A ligação ao servidor demorou demasiado. Tenta novamente."
-            : "Não foi possível ligar ao servidor. Verifica a tua ligação.",
-        ),
+      throw new ApiError(
+        0,
+        axiosError.code === "ECONNABORTED"
+          ? "A ligação ao servidor demorou demasiado. Tenta novamente."
+          : "Não foi possível ligar ao servidor. Verifica a tua ligação.",
       );
     }
-    return Promise.reject(error);
+    throw error;
   },
 );
 
@@ -92,9 +107,10 @@ async function fetchWithNetworkRetry<T>(
     try {
       return await request();
     } catch (error) {
-      // Só retenta em falhas de rede (sem resposta HTTP), não em erros de negócio.
-      if (!axios.isAxiosError(error) || !(error as AxiosError).response) {
-        if (attempt === attempts) throw error;
+      // O interceptor já converteu tudo em `ApiError`; `status === 0` é o caso
+      // "sem resposta" (rede/timeout) — o único que vale a pena retentar.
+      const isNetworkFailure = error instanceof ApiError && error.status === 0;
+      if (isNetworkFailure && attempt < attempts) {
         await sleep(NETWORK_RETRY_DELAY_MS);
         continue;
       }
