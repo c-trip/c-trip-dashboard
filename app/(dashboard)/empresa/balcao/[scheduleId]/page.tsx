@@ -2,7 +2,7 @@ import Link from "next/link";
 import { IconArrowLeft } from "@tabler/icons-react";
 
 import { SellForm } from "./sell-form";
-import { CompanyBlocked } from "@/components/feedback/company-blocked";
+import { ApiErrorState } from "@/components/feedback/api-error-state";
 import { getSchedule, getScheduleSeats } from "@/lib/api/schedules";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { requirePermission } from "@/lib/auth/session";
@@ -23,7 +23,7 @@ export default async function BalcaoVendaPage({
       getSchedule(scheduleId),
       getScheduleSeats(scheduleId),
     ]);
-  } catch {
+  } catch (error) {
     return (
       <div className="flex max-w-lg flex-col gap-6 animate-fade-in">
         <div>
@@ -31,7 +31,7 @@ export default async function BalcaoVendaPage({
             Venda ao balcão
           </h2>
         </div>
-        <CompanyBlocked message="Não foi possível carregar esta viagem. Verifica se ainda tem embarque aberto." />
+        <ApiErrorState error={error} />
       </div>
     );
   }

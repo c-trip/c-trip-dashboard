@@ -1,5 +1,5 @@
 import { CashFlowReport } from "@/components/dashboard/cash-flow-report";
-import { CompanyBlocked } from "@/components/feedback/company-blocked";
+import { ApiErrorState } from "@/components/feedback/api-error-state";
 import { PaymentsFilterBar } from "@/components/feedback/payments-filter-bar";
 import { PaymentsSummaryCards } from "@/components/feedback/payments-summary-cards";
 import { getCompanyPaymentsSummary } from "@/lib/api/payments";
@@ -25,7 +25,7 @@ export default async function RelatoriosPage({
   let summary;
   try {
     summary = await getCompanyPaymentsSummary(filters);
-  } catch {
+  } catch (error) {
     return (
       <div className="flex flex-col gap-6 animate-fade-in">
         <div>
@@ -33,7 +33,7 @@ export default async function RelatoriosPage({
             Fluxo de caixa
           </h2>
         </div>
-        <CompanyBlocked />
+        <ApiErrorState error={error} />
       </div>
     );
   }

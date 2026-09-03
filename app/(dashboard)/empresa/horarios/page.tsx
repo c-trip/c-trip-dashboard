@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { CompanyBlocked } from "@/components/feedback/company-blocked";
+import { ApiErrorState } from "@/components/feedback/api-error-state";
 import { ScheduleRowActions } from "./schedule-row-actions";
 import { SimpleTable } from "@/components/tables/simple-table";
 import { StatusBadge } from "@/components/feedback/status-badge";
@@ -20,13 +20,15 @@ export default async function HorariosPage() {
   let schedules;
   try {
     schedules = await getCompanySchedules();
-  } catch {
+  } catch (error) {
     return (
       <div className="flex flex-col gap-6 animate-fade-in">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-foreground">Horários</h2>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
+            Horários
+          </h2>
         </div>
-        <CompanyBlocked />
+        <ApiErrorState error={error} />
       </div>
     );
   }
@@ -35,7 +37,9 @@ export default async function HorariosPage() {
     <div className="flex flex-col gap-6 animate-fade-in">
       <div className="flex items-end justify-between">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-foreground">Horários</h2>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
+            Horários
+          </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Viagens agendadas pela empresa, em todas as rotas.
           </p>
@@ -53,10 +57,28 @@ export default async function HorariosPage() {
         emptyTitle="Ainda não há horários"
         emptyDescription="Cria uma rota primeiro — sem rota não há como agendar uma viagem."
         columns={[
-          { header: "Rota", cell: (s) => <span className="font-medium">{s.origin} → {s.destination}</span> },
-          { header: "Partida", cell: (s) => `${s.departure_date} · ${s.departure_time}` },
-          { header: "Lugares", cell: (s) => <span className="tabular-nums">{`${s.available_seats}/${s.total_seats} livres`}</span> },
-          { header: "Estado", cell: (s) => <StatusBadge domain="schedule" status={s.status} /> },
+          {
+            header: "Rota",
+            cell: (s) => (
+              <span className="font-medium">
+                {s.origin} → {s.destination}
+              </span>
+            ),
+          },
+          {
+            header: "Partida",
+            cell: (s) => `${s.departure_date} · ${s.departure_time}`,
+          },
+          {
+            header: "Lugares",
+            cell: (s) => (
+              <span className="tabular-nums">{`${s.available_seats}/${s.total_seats} livres`}</span>
+            ),
+          },
+          {
+            header: "Estado",
+            cell: (s) => <StatusBadge domain="schedule" status={s.status} />,
+          },
           {
             header: "",
             cell: (s) =>

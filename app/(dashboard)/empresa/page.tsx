@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { unstable_rethrow } from "next/navigation";
 
-import { CompanyBlocked } from "@/components/feedback/company-blocked";
+import { ApiErrorState } from "@/components/feedback/api-error-state";
 import { RevenueChart } from "@/components/dashboard/revenue-chart";
 import { SectionCards, type SectionCardItem } from "@/components/section-cards";
 import { SimpleTable } from "@/components/tables/simple-table";
@@ -12,21 +12,23 @@ import { getCompanySchedules } from "@/lib/api/schedules";
 import { formatCurrency } from "@/lib/format";
 import { requireAuth } from "@/lib/auth/session";
 
-/** Devolve `null` em vez de rebentar — mas deixa passar redirects do Next (sessão expirada). */
-async function safe<T>(promise: Promise<T>): Promise<T | null> {
-  try {
-    return await promise;
-  } catch (error) {
-    unstable_rethrow(error);
-    return null;
-  }
-}
-
 export default async function EmpresaOverviewPage() {
   await requireAuth();
 
   // Cada bloco é independente: um 403 por falta de permissão (colaborador limitado)
-  // não deve esconder o resto do painel.
+  // não deve esconder o resto do painel. Guardamos o 1.º erro para o caso de
+  // tudo falhar — `unstable_rethrow` deixa passar redirects do Next.
+  let firstError: unknown;
+  async function safe<T>(promise: Promise<T>): Promise<T | null> {
+    try {
+      return await promise;
+    } catch (error) {
+      unstable_rethrow(error);
+      firstError ??= error;
+      return null;
+    }
+  }
+
   const [routes, schedules, summary] = await Promise.all([
     safe(getCompanyRoutes()),
     safe(getCompanySchedules()),
@@ -41,7 +43,7 @@ export default async function EmpresaOverviewPage() {
             Visão geral
           </h2>
         </div>
-        <CompanyBlocked />
+        <ApiErrorState error={firstError} />
       </div>
     );
   }

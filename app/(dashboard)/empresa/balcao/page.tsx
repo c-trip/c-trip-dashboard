@@ -4,7 +4,7 @@ import {
   BalcaoTripList,
   type BalcaoTrip,
 } from "@/components/operator/balcao-trip-list";
-import { CompanyBlocked } from "@/components/feedback/company-blocked";
+import { ApiErrorState } from "@/components/feedback/api-error-state";
 import { DateFilter } from "@/components/feedback/date-filter";
 import {
   Card,
@@ -48,7 +48,7 @@ export default async function BalcaoPage({
   let schedules;
   try {
     schedules = await getOperatorSchedules(date);
-  } catch {
+  } catch (error) {
     return (
       <div className="flex flex-col gap-6 animate-fade-in">
         <div>
@@ -56,7 +56,7 @@ export default async function BalcaoPage({
             Balcão
           </h2>
         </div>
-        <CompanyBlocked message="A venda ao balcão só está disponível para operadores de empresas aprovadas." />
+        <ApiErrorState error={error} />
       </div>
     );
   }

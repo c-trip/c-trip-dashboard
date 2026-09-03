@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { CompanyBlocked } from "@/components/feedback/company-blocked";
+import { ApiErrorState } from "@/components/feedback/api-error-state";
 import { SimpleTable } from "@/components/tables/simple-table";
 import { StatusBadge } from "@/components/feedback/status-badge";
 import { formatCurrency, formatDateTime } from "@/lib/format";
@@ -14,7 +14,7 @@ export default async function PagamentosPage() {
   let payments;
   try {
     payments = await getCompanyPayments();
-  } catch {
+  } catch (error) {
     return (
       <div className="flex flex-col gap-6 animate-fade-in">
         <div>
@@ -22,7 +22,7 @@ export default async function PagamentosPage() {
             Pagamentos
           </h2>
         </div>
-        <CompanyBlocked />
+        <ApiErrorState error={error} />
       </div>
     );
   }

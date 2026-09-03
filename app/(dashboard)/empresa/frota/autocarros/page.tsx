@@ -2,7 +2,7 @@ import Link from "next/link";
 import { IconPlus } from "@tabler/icons-react";
 
 import { BusRowActions } from "./bus-row-actions";
-import { CompanyBlocked } from "@/components/feedback/company-blocked";
+import { ApiErrorState } from "@/components/feedback/api-error-state";
 import { SimpleTable } from "@/components/tables/simple-table";
 import { StatusBadge } from "@/components/feedback/status-badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -18,13 +18,15 @@ export default async function AutocarrosPage() {
   let buses;
   try {
     buses = await getBuses();
-  } catch {
+  } catch (error) {
     return (
       <div className="flex flex-col gap-6 animate-fade-in">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-foreground">Autocarros</h2>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
+            Autocarros
+          </h2>
         </div>
-        <CompanyBlocked />
+        <ApiErrorState error={error} />
       </div>
     );
   }
@@ -33,8 +35,12 @@ export default async function AutocarrosPage() {
     <div className="flex flex-col gap-6 animate-fade-in">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-foreground">Autocarros</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Frota cadastrada pela empresa.</p>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
+            Autocarros
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Frota cadastrada pela empresa.
+          </p>
         </div>
         {canCreate ? (
           <Link
@@ -52,13 +58,29 @@ export default async function AutocarrosPage() {
         emptyTitle="Ainda não há autocarros"
         emptyDescription="Cadastra o primeiro autocarro para começar a agendar viagens."
         columns={[
-          { header: "Modelo", cell: (b) => <span className="font-medium">{b.model}</span> },
-          { header: "Matrícula", cell: (b) => <span className="font-mono text-xs">{b.plate}</span> },
-          { header: "Lugares", cell: (b) => <span className="tabular-nums">{String(b.seats)}</span> },
-          { header: "Estado", cell: (b) => <StatusBadge domain="bus" status={b.status} /> },
+          {
+            header: "Modelo",
+            cell: (b) => <span className="font-medium">{b.model}</span>,
+          },
+          {
+            header: "Matrícula",
+            cell: (b) => <span className="font-mono text-xs">{b.plate}</span>,
+          },
+          {
+            header: "Lugares",
+            cell: (b) => (
+              <span className="tabular-nums">{String(b.seats)}</span>
+            ),
+          },
+          {
+            header: "Estado",
+            cell: (b) => <StatusBadge domain="bus" status={b.status} />,
+          },
           {
             header: "",
-            cell: (b) => <BusRowActions busId={b.id} currentStatus={b.status} />,
+            cell: (b) => (
+              <BusRowActions busId={b.id} currentStatus={b.status} />
+            ),
             className: "text-right",
           },
         ]}

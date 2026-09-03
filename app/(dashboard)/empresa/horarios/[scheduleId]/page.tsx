@@ -3,7 +3,7 @@ import { notFound, unstable_rethrow } from "next/navigation";
 import { IconArrowLeft } from "@tabler/icons-react";
 
 import { EditScheduleForm } from "./edit-schedule-form";
-import { CompanyBlocked } from "@/components/feedback/company-blocked";
+import { ApiErrorState } from "@/components/feedback/api-error-state";
 import { SeatMap } from "@/components/schedules/seat-map";
 import { Card, CardContent } from "@/components/ui/card";
 import { getBuses, getDrivers } from "@/lib/api/fleet";
@@ -28,7 +28,7 @@ export default async function EditarHorarioPage({
       getBuses(),
       getDrivers(),
     ]);
-  } catch {
+  } catch (error) {
     return (
       <div className="flex max-w-lg flex-col gap-6 animate-fade-in">
         <div>
@@ -36,7 +36,7 @@ export default async function EditarHorarioPage({
             Editar horário
           </h2>
         </div>
-        <CompanyBlocked />
+        <ApiErrorState error={error} />
       </div>
     );
   }

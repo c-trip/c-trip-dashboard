@@ -2,7 +2,7 @@ import Link from "next/link";
 import { IconArrowLeft } from "@tabler/icons-react";
 
 import { CollaboratorWizard } from "./collaborator-wizard";
-import { CompanyBlocked } from "@/components/feedback/company-blocked";
+import { ApiErrorState } from "@/components/feedback/api-error-state";
 import {
   getAssignableCompanyPermissions,
   type CompanyPermission,
@@ -18,7 +18,7 @@ export default async function NovoColaboradorPage() {
   if (canAssignPermissions) {
     try {
       permissions = await getAssignableCompanyPermissions();
-    } catch {
+    } catch (error) {
       return (
         <div className="flex max-w-2xl flex-col gap-6 animate-fade-in">
           <div>
@@ -26,7 +26,7 @@ export default async function NovoColaboradorPage() {
               Novo colaborador
             </h2>
           </div>
-          <CompanyBlocked />
+          <ApiErrorState error={error} />
         </div>
       );
     }

@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { ValidatePanel } from "./validate-panel";
-import { CompanyBlocked } from "@/components/feedback/company-blocked";
+import { ApiErrorState } from "@/components/feedback/api-error-state";
 import { SchedulePicker } from "@/components/operator/schedule-picker";
 import { getOperatorSchedules } from "@/lib/api/operator";
 import { PERMISSIONS } from "@/lib/auth/permissions";
@@ -20,7 +20,7 @@ export default async function EmbarquePage({
   let schedules;
   try {
     schedules = await getOperatorSchedules();
-  } catch {
+  } catch (error) {
     return (
       <div className="flex flex-col gap-6 animate-fade-in">
         <div>
@@ -28,7 +28,7 @@ export default async function EmbarquePage({
             Embarque
           </h2>
         </div>
-        <CompanyBlocked message="O controlo de embarque só está disponível para operadores de empresas aprovadas." />
+        <ApiErrorState error={error} />
       </div>
     );
   }
