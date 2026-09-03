@@ -9,14 +9,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Step, Stepper } from "@/components/ui/stepper";
-import type { CompanyPermission } from "@/lib/api/companies";
+import type {
+  CompanyPermission,
+  CompanyRoleSummary,
+} from "@/lib/api/companies";
 import { initialActionState } from "@/lib/forms/action-state";
+
+const selectClass =
+  "flex h-10 w-full min-w-0 rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
 
 export function CollaboratorWizard({
   permissions,
+  roles,
   canAssignPermissions,
 }: {
   permissions: CompanyPermission[];
+  roles: CompanyRoleSummary[];
   canAssignPermissions: boolean;
 }) {
   const [state, action, pending] = useActionState(
@@ -25,6 +33,7 @@ export function CollaboratorWizard({
   );
   const [step, setStep] = useState(0);
   const [values, setValues] = useState({ name: "", email: "", password: "" });
+  const [roleId, setRoleId] = useState("");
   const [perms, setPerms] = useState<string[]>([]);
   const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
 
@@ -97,14 +106,16 @@ export function CollaboratorWizard({
           <input type="hidden" name="name" value={values.name} />
           <input type="hidden" name="email" value={values.email} />
           <input type="hidden" name="password" value={values.password} />
-          {perms.map((codigo) => (
-            <input
-              key={codigo}
-              type="hidden"
-              name="permission_codes"
-              value={codigo}
-            />
-          ))}
+          <input type="hidden" name="role_id" value={roleId} />
+          {!roleId &&
+            perms.map((codigo) => (
+              <input
+                key={codigo}
+                type="hidden"
+                name="permission_codes"
+                value={codigo}
+              />
+            ))}
 
           <FormError message={state.formError} />
 
@@ -123,15 +134,51 @@ export function CollaboratorWizard({
               >
                 <Step>{identityFields}</Step>
                 <Step>
-                  <p className="text-sm text-muted-foreground">
-                    Escolhe o que este colaborador pode fazer. Podes ajustar
-                    mais tarde na página dele.
-                  </p>
-                  <PermissionChecklist
-                    options={permissions}
-                    value={perms}
-                    onChange={setPerms}
-                  />
+                  {roles.length > 0 ? (
+                    <FormField
+                      htmlFor="role"
+                      label="Role"
+                      hint="O caminho normal — traz o pacote de permissões já montado."
+                    >
+                      <select
+                        id="role"
+                        value={roleId}
+                        onChange={(e) => setRoleId(e.target.value)}
+                        className={selectClass}
+                      >
+                        <option value="">
+                          Sem role (escolher permissões abaixo)
+                        </option>
+                        {roles.map((role) => (
+                          <option key={role.id} value={role.id}>
+                            {role.nome}
+                            {role.permission_count
+                              ? ` · ${role.permission_count} permissões`
+                              : ""}
+                          </option>
+                        ))}
+                      </select>
+                    </FormField>
+                  ) : null}
+
+                  {roleId ? (
+                    <p className="text-sm text-muted-foreground">
+                      As permissões vêm da role escolhida. Podes afinar depois
+                      na página do colaborador.
+                    </p>
+                  ) : (
+                    <>
+                      <p className="text-sm text-muted-foreground">
+                        Ou marca permissões específicas. Podes ajustar mais
+                        tarde na página dele.
+                      </p>
+                      <PermissionChecklist
+                        options={permissions}
+                        value={perms}
+                        onChange={setPerms}
+                      />
+                    </>
+                  )}
                 </Step>
               </Stepper>
 

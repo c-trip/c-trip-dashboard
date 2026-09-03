@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/format";
+import { qrImageSrc } from "@/lib/qr";
 import type { OperatorSaleResponse } from "@/lib/api/operator";
 
 const METHOD_LABELS: Record<string, string> = {
@@ -59,13 +60,19 @@ export function SaleReceipt({
         </div>
 
         <div className="my-4 flex justify-center">
-          {/* qr_image é um data URI SVG do backend. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={sale.qr_image}
-            alt={`QR de ${sale.passenger_name}`}
-            className="size-44"
-          />
+          {sale.qr_image ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={qrImageSrc(sale.qr_image)}
+              alt={`QR de ${sale.passenger_name}`}
+              className="size-44"
+            />
+          ) : (
+            <p className="px-4 py-8 text-xs text-destructive">
+              A API não devolveu o QR desta venda. Usa o código em baixo para
+              validar o embarque.
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-1.5 border-t border-dashed border-border pt-3">

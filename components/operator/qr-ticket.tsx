@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { qrImageSrc } from "@/lib/qr";
 
 interface QrTicketProps {
   qrImage: string;
@@ -29,13 +30,18 @@ export function QrTicket({
       className="max-w-sm print:border-0 print:shadow-none"
     >
       <CardContent className="flex flex-col items-center gap-4 text-center">
-        {/* qr_image é um data URI SVG devolvido pelo backend — não passa por next/image. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={qrImage}
-          alt={`QR do bilhete de ${passengerName}`}
-          className="size-48 print:size-40"
-        />
+        {qrImage ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={qrImageSrc(qrImage)}
+            alt={`QR do bilhete de ${passengerName}`}
+            className="size-48 print:size-40"
+          />
+        ) : (
+          <p className="py-8 text-xs text-destructive">
+            A API não devolveu o QR. Usa o código em baixo.
+          </p>
+        )}
         <div className="flex flex-col gap-1">
           <p className="text-base font-bold text-foreground">{passengerName}</p>
           <p className="text-sm text-muted-foreground">

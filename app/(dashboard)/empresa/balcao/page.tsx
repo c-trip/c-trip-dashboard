@@ -5,13 +5,6 @@ import {
   type BalcaoTrip,
 } from "@/components/operator/balcao-trip-list";
 import { ApiErrorState } from "@/components/feedback/api-error-state";
-import { DateFilter } from "@/components/feedback/date-filter";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { getOperatorSchedules } from "@/lib/api/operator";
 import { getCompanyPaymentsSummary } from "@/lib/api/payments";
 import { getCompanyRoutes } from "@/lib/api/routes";
@@ -80,31 +73,25 @@ export default async function BalcaoPage({
 
   return (
     <div className="flex flex-col gap-6 animate-fade-in">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight text-foreground">
-            Balcão
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Viagens com lugares à venda. Escolhe uma para vender um bilhete.
-          </p>
-        </div>
-        {todaySummary ? (
-          <Card className="gap-1 py-3">
-            <CardHeader className="px-4">
-              <CardDescription>Recebido hoje (empresa)</CardDescription>
-              <CardTitle className="text-lg font-semibold tabular-nums">
+      <div>
+        <h2 className="text-xl font-bold tracking-tight text-foreground">
+          Balcão
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Viagens com lugares à venda. Escolhe uma para vender um bilhete.
+          {todaySummary ? (
+            <>
+              {" · Recebido hoje "}
+              <span className="font-semibold tabular-nums text-foreground">
                 {formatCurrency(todaySummary.total_confirmed)}
-              </CardTitle>
-              <p className="text-xs text-muted-foreground tabular-nums">
-                {todaySummary.count_confirmed} bilhete(s)
-              </p>
-            </CardHeader>
-          </Card>
-        ) : null}
+              </span>
+              {` em ${todaySummary.count_confirmed} bilhete(s)`}
+            </>
+          ) : null}
+        </p>
       </div>
-      <DateFilter initial={date} label="Data de partida" />
-      <BalcaoTripList trips={trips} />
+
+      <BalcaoTripList trips={trips} date={date} />
     </div>
   );
 }

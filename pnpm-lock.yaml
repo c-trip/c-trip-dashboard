@@ -40,6 +40,9 @@ importers:
       date-fns:
         specifier: ^4.4.0
         version: 4.4.0
+      jsqr:
+        specifier: ^1.4.0
+        version: 1.4.0
       libphonenumber-js:
         specifier: ^1.13.10
         version: 1.13.10
@@ -88,7 +91,7 @@ importers:
     devDependencies:
       "@chromatic-com/storybook":
         specifier: latest
-        version: 5.3.0(storybook@10.5.7(@types/react@19.2.18)(prettier@3.9.6)(react@19.2.8))
+        version: 5.3.1(storybook@10.5.7(@types/react@19.2.18)(prettier@3.9.6)(react@19.2.8))
       "@commitlint/cli":
         specifier: ^21.2.1
         version: 21.2.1(@types/node@20.19.43)(conventional-commits-parser@7.1.2)(typescript@5.9.3)
@@ -102,7 +105,7 @@ importers:
         specifier: ^10.5.7
         version: 10.5.7(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(esbuild@0.28.2)(storybook@10.5.7(@types/react@19.2.18)(prettier@3.9.6)(react@19.2.8))(vite@8.2.2(@types/node@20.19.43)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.0))
       "@storybook/addon-mcp":
-        specifier: latest
+        specifier: 0.7.0
         version: 0.7.0(@storybook/addon-vitest@10.5.7(@vitest/browser-playwright@4.1.11)(@vitest/browser@4.1.11)(@vitest/runner@4.1.11)(react@19.2.8)(storybook@10.5.7(@types/react@19.2.18)(prettier@3.9.6)(react@19.2.8))(vitest@4.1.11))(storybook@10.5.7(@types/react@19.2.18)(prettier@3.9.6)(react@19.2.8))(typescript@5.9.3)
       "@storybook/addon-vitest":
         specifier: ^10.5.7
@@ -445,14 +448,14 @@ packages:
         integrity: sha512-ehg3jIkYKulZh+8om/O25vkvSsXXwC+skXmyA87FFx6A/45eqOkZsBltMw/TVteb0mloiGT8oGRTcjRAz66zaA==,
       }
 
-  "@chromatic-com/storybook@5.3.0":
+  "@chromatic-com/storybook@5.3.1":
     resolution:
       {
-        integrity: sha512-gMAfVYJnF/tjdY8C3Q54KYz/low2NFjPIZMpCqSFuMUiTJ2DNWCTb7mFhuuzZ1iduWFDhewlJyilFmvKcEDYRA==,
+        integrity: sha512-eUcbR9CddVmKAnjOiBCOz5rNdT096jiXIjR+qaWbUuTlgRdpc9yjTrk4/hiPAAykZrPYVNJN11p6rJgW9KNpKg==,
       }
     engines: { node: ">=20.0.0", yarn: ">=1.22.18" }
     peerDependencies:
-      storybook: ^0.0.0-0 || ^10.1.0 || ^10.1.0-0 || ^10.2.0-0 || ^10.3.0-0 || ^10.4.0-0 || ^10.5.0-0 || ^10.6.0-0
+      storybook: ^0.0.0-0 || ^10.1.0 || ^10.1.0-0 || ^10.2.0-0 || ^10.3.0-0 || ^10.4.0-0 || ^10.5.0-0 || ^10.6.0-0 || ^11.0.0-0
 
   "@commitlint/cli@21.2.1":
     resolution:
@@ -5528,6 +5531,12 @@ packages:
         integrity: sha512-zwOTdL3rFQ/lRdBnntKVOX6k5cKJwEc1HdilT71BWEu7J41gXIB2MRp+vxduPSwZJPWBxEzv4yH1wYLJGUHX4Q==,
       }
 
+  jsqr@1.4.0:
+    resolution:
+      {
+        integrity: sha512-dxLob7q65Xg2DvstYkRpkYtmKm2sPJ9oFhrhmudT1dZvNFFTlroai3AWSpLey/w5vMcLBXRgOJsbXpdN9HzU/A==,
+      }
+
   jsx-ast-utils@3.3.5:
     resolution:
       {
@@ -7627,6 +7636,17 @@ packages:
       typescript:
         optional: true
 
+  valibot@1.4.2:
+    resolution:
+      {
+        integrity: sha512-gjdCvJ6d3RyHAneqxMYMW9QMCwYMb3jpOO0IyHZV1bnRHFBHrX3VkIILt5XYR0WhwHiH7Mty8ovuPZ/O3gamrg==,
+      }
+    peerDependencies:
+      typescript: ">=5"
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   validate-npm-package-name@7.0.2:
     resolution:
       {
@@ -8166,7 +8186,7 @@ snapshots:
 
   "@blazediff/core@1.9.1": {}
 
-  "@chromatic-com/storybook@5.3.0(storybook@10.5.7(@types/react@19.2.18)(prettier@3.9.6)(react@19.2.8))":
+  "@chromatic-com/storybook@5.3.1(storybook@10.5.7(@types/react@19.2.18)(prettier@3.9.6)(react@19.2.8))":
     dependencies:
       "@neoconfetti/react": 1.0.0
       chromatic: 18.2.0
@@ -11204,6 +11224,8 @@ snapshots:
     optionalDependencies:
       graceful-fs: 4.2.11
 
+  jsqr@1.4.0: {}
+
   jsx-ast-utils@3.3.5:
     dependencies:
       array-includes: 3.1.9
@@ -12402,7 +12424,7 @@ snapshots:
       json-rpc-2.0: 1.7.1
       sqids: 0.3.0
       uri-template-matcher: 1.1.2
-      valibot: 1.2.0(typescript@5.9.3)
+      valibot: 1.4.2(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
@@ -12572,6 +12594,10 @@ snapshots:
   util-deprecate@1.0.2: {}
 
   valibot@1.2.0(typescript@5.9.3):
+    optionalDependencies:
+      typescript: 5.9.3
+
+  valibot@1.4.2(typescript@5.9.3):
     optionalDependencies:
       typescript: 5.9.3
 

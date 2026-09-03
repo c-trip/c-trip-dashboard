@@ -1,11 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import jsQR from "jsqr";
 import { IconCamera, IconX } from "@tabler/icons-react";
 
 import { Button } from "@/components/ui/button";
 
-// `BarcodeDetector` ainda não está nos tipos padrão do DOM.
+// `BarcodeDetector` é o caminho rápido (Android/ChromeOS). No desktop não existe,
+// por isso o `jsQR` faz a descodificação em JS a partir dos frames do vídeo.
 interface BarcodeDetectorLike {
   detect(source: CanvasImageSource): Promise<Array<{ rawValue: string }>>;
 }
@@ -26,19 +28,15 @@ function extractHash(raw: string): string | null {
   return match ? match[0] : null;
 }
 
-/**
- * Leitor de QR pela câmara traseira, via `BarcodeDetector` (nativo em Chrome /
- * Android). Onde não existe, o operador usa o campo de texto ao lado.
- */
+const MAX_EDGE = 480;
+
 export function QrScanner({ onScan }: { onScan: (hash: string) => void }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const supported =
-    typeof window !== "undefined" && "BarcodeDetector" in window;
 
   const stop = useCallback(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -52,33 +50,57 @@ export function QrScanner({ onScan }: { onScan: (hash: string) => void }) {
 
   async function start() {
     setError(null);
-    if (!window.BarcodeDetector) {
-      setError("Este browser não lê QR pela câmara. Introduz o código à mão.");
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setError("Este browser não dá acesso à câmara. Introduz o código à mão.");
       return;
     }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "environment" },
       });
       streamRef.current = stream;
       setOpen(true);
+
       const video = videoRef.current;
       if (!video) return;
       video.srcObject = stream;
       await video.play();
 
-      const detector = new window.BarcodeDetector({ formats: ["qr_code"] });
+      const detector = window.BarcodeDetector
+        ? new window.BarcodeDetector({ formats: ["qr_code"] })
+        : null;
+
+      const canvas = (canvasRef.current ??= document.createElement("canvas"));
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+      const found = (raw: string) => {
+        const hash = extractHash(raw);
+        if (!hash) return false;
+        onScan(hash);
+        stop();
+        return true;
+      };
+
       const tick = async () => {
         if (!streamRef.current) return;
         try {
-          const codes = await detector.detect(video);
-          for (const code of codes) {
-            const hash = extractHash(code.rawValue);
-            if (hash) {
-              onScan(hash);
-              stop();
-              return;
-            }
+          if (detector) {
+            const codes = await detector.detect(video);
+            for (const code of codes) if (found(code.rawValue)) return;
+          } else if (ctx && video.videoWidth > 0) {
+            const scale = Math.min(
+              1,
+              MAX_EDGE / Math.max(video.videoWidth, video.videoHeight),
+            );
+            canvas.width = Math.round(video.videoWidth * scale);
+            canvas.height = Math.round(video.videoHeight * scale);
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const result = jsQR(frame.data, frame.width, frame.height, {
+              inversionAttempts: "dontInvert",
+            });
+            if (result && found(result.data)) return;
           }
         } catch {
           // frame ainda não pronto — continua a tentar
@@ -87,7 +109,9 @@ export function QrScanner({ onScan }: { onScan: (hash: string) => void }) {
       };
       rafRef.current = requestAnimationFrame(tick);
     } catch {
-      setError("Não foi possível aceder à câmara. Verifica as permissões.");
+      setError(
+        "Não foi possível aceder à câmara. Verifica as permissões do browser.",
+      );
       stop();
     }
   }
@@ -95,10 +119,10 @@ export function QrScanner({ onScan }: { onScan: (hash: string) => void }) {
   return (
     <div className="flex flex-col gap-2">
       {open ? (
-        <div className="relative overflow-hidden rounded-lg border border-border bg-black">
+        <div className="relative w-fit overflow-hidden rounded-lg border border-border bg-black">
           <video
             ref={videoRef}
-            className="aspect-square w-full max-w-xs object-cover"
+            className="aspect-square w-64 object-cover"
             muted
             playsInline
           />
@@ -118,18 +142,12 @@ export function QrScanner({ onScan }: { onScan: (hash: string) => void }) {
           type="button"
           variant="outline"
           onClick={start}
-          disabled={!supported}
           className="w-fit"
         >
           <IconCamera size={16} data-icon="inline-start" />
           Ler QR com a câmara
         </Button>
       )}
-      {!supported ? (
-        <p className="text-xs text-muted-foreground">
-          Câmara indisponível neste browser — usa o campo abaixo.
-        </p>
-      ) : null}
       {error ? <p className="text-xs text-destructive">{error}</p> : null}
     </div>
   );

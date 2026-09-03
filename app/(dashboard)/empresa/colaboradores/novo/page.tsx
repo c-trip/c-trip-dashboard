@@ -3,9 +3,12 @@ import { IconArrowLeft } from "@tabler/icons-react";
 
 import { CollaboratorWizard } from "./collaborator-wizard";
 import { ApiErrorState } from "@/components/feedback/api-error-state";
+import { assignableRoles } from "@/config/flags";
 import {
   getAssignableCompanyPermissions,
+  getCompanyRoles,
   type CompanyPermission,
+  type CompanyRoleSummary,
 } from "@/lib/api/companies";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { can, requirePermission } from "@/lib/auth/session";
@@ -15,9 +18,15 @@ export default async function NovoColaboradorPage() {
   const canAssignPermissions = await can(PERMISSIONS.companyRoleAssign);
 
   let permissions: CompanyPermission[] = [];
+  let roles: CompanyRoleSummary[] = [];
   if (canAssignPermissions) {
     try {
-      permissions = await getAssignableCompanyPermissions();
+      const [perms, companyRoles] = await Promise.all([
+        getAssignableCompanyPermissions(),
+        getCompanyRoles(),
+      ]);
+      permissions = perms;
+      roles = assignableRoles(companyRoles);
     } catch (error) {
       return (
         <div className="flex max-w-2xl flex-col gap-6 animate-fade-in">
@@ -51,6 +60,7 @@ export default async function NovoColaboradorPage() {
       </div>
       <CollaboratorWizard
         permissions={permissions}
+        roles={roles}
         canAssignPermissions={canAssignPermissions}
       />
     </div>

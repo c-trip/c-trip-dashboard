@@ -1,7 +1,7 @@
 import { ApiErrorState } from "@/components/feedback/api-error-state";
 import { CollaboratorRoles } from "./collaborator-roles";
 import { PermissionForm } from "./permission-form";
-import { flags } from "@/config/flags";
+import { assignableRoles } from "@/config/flags";
 import {
   getAssignableCompanyPermissions,
   getCollaboratorRoles,
@@ -39,11 +39,7 @@ export default async function ColaboradorPermissoesPage({
     );
   }
 
-  // A role global "gestor" dá acesso total — só é atribuível se a flag estiver ligada
-  // (ver config/flags.ts e o gap de segurança descrito na arquitectura).
-  const assignableRoles = flags.ENABLE_GLOBAL_ROLE_ASSIGNMENT
-    ? companyRoles
-    : companyRoles.filter((role) => role.empresa_id !== null);
+  const roles = assignableRoles(companyRoles);
 
   return (
     <div className="flex max-w-2xl flex-col gap-6 animate-fade-in">
@@ -58,9 +54,10 @@ export default async function ColaboradorPermissoesPage({
           Permissões de {current.user_name}
         </h2>
         <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-          Podes dar acesso de duas formas: atribuindo uma <strong>role</strong>{" "}
-          (conjunto pré-definido) ou marcando <strong>permissões soltas</strong>
-          . Cada gravação de permissões soltas substitui a lista inteira.
+          O caminho normal é atribuir uma <strong>role</strong> — por exemplo{" "}
+          <strong>operador_balcao</strong>, que já traz o pacote do balcão
+          (vender, ver viagens, validar QR, registar embarque e ver caixa) num
+          clique. As permissões soltas em baixo ficam para casos especiais.
         </p>
       </div>
 
@@ -68,13 +65,16 @@ export default async function ColaboradorPermissoesPage({
         <CollaboratorRoles
           userId={userId}
           currentRoles={current.roles}
-          assignableRoles={assignableRoles}
+          assignableRoles={roles}
         />
       ) : null}
 
       <div className="flex flex-col gap-3">
         <h3 className="text-sm font-semibold text-foreground">
-          Permissões soltas
+          Permissões soltas{" "}
+          <span className="font-normal text-muted-foreground">
+            (casos especiais)
+          </span>
         </h3>
         {current.roles.length > 0 ? (
           <p className="text-xs text-muted-foreground">
