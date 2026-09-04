@@ -1,49 +1,56 @@
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { MetricStrip, type Metric } from "@/components/dashboard/metric-strip";
 import { formatCurrency } from "@/lib/format";
 import type { PaymentsSummary } from "@/lib/api/types";
-import { cn } from "@/lib/utils";
 
-interface PaymentsSummaryCardsProps {
-  summary: PaymentsSummary;
-  className?: string;
-}
-
-const CARDS: Array<{
+const ROWS: Array<{
   label: string;
   total: keyof PaymentsSummary;
   count: keyof PaymentsSummary;
-  accent: string;
+  accent: Metric["accent"];
 }> = [
-  { label: "Recebido", total: "total_confirmed", count: "count_confirmed", accent: "text-emerald-600 dark:text-emerald-400" },
-  { label: "Pendente", total: "total_pending", count: "count_pending", accent: "text-amber-600 dark:text-amber-400" },
-  { label: "Falhado", total: "total_failed", count: "count_failed", accent: "text-destructive" },
-  { label: "Cancelado", total: "total_cancelled", count: "count_cancelled", accent: "text-muted-foreground" },
+  {
+    label: "Recebido",
+    total: "total_confirmed",
+    count: "count_confirmed",
+    accent: "positive",
+  },
+  {
+    label: "Pendente",
+    total: "total_pending",
+    count: "count_pending",
+    accent: "warning",
+  },
+  {
+    label: "Falhado",
+    total: "total_failed",
+    count: "count_failed",
+    accent: "negative",
+  },
+  {
+    label: "Cancelado",
+    total: "total_cancelled",
+    count: "count_cancelled",
+    accent: "default",
+  },
 ];
 
 /**
- * Cartões de resumo financeiro, partilhados pelo painel do Admin
- * (`/admin/payments/summary`) e do Gestor (`/payments/company/summary`).
+ * Resumo financeiro (recebido / pendente / falhado / cancelado), partilhado pelo
+ * painel do Admin e do Gestor.
  */
-export function PaymentsSummaryCards({ summary, className }: PaymentsSummaryCardsProps) {
-  return (
-    <div className={cn("grid grid-cols-2 gap-4 lg:grid-cols-4", className)}>
-      {CARDS.map((card) => {
-        const total = summary[card.total] as number;
-        const count = summary[card.count] as number;
-        return (
-          <Card key={card.label} className="gap-2 py-4">
-            <CardHeader className="px-4">
-              <CardDescription>{card.label}</CardDescription>
-              <CardTitle className={cn("text-xl font-semibold tabular-nums", card.accent)}>
-                {formatCurrency(total)}
-              </CardTitle>
-              <p className="text-xs text-muted-foreground tabular-nums">
-                {count} {count === 1 ? "pagamento" : "pagamentos"}
-              </p>
-            </CardHeader>
-          </Card>
-        );
-      })}
-    </div>
-  );
+export function PaymentsSummaryCards({
+  summary,
+}: {
+  summary: PaymentsSummary;
+}) {
+  const metrics: Metric[] = ROWS.map((row) => {
+    const count = summary[row.count] as number;
+    return {
+      label: row.label,
+      value: formatCurrency(summary[row.total] as number),
+      hint: `${count} ${count === 1 ? "pagamento" : "pagamentos"}`,
+      accent: row.accent,
+    };
+  });
+  return <MetricStrip metrics={metrics} />;
 }

@@ -1,5 +1,6 @@
 import { CashFlowReport } from "@/components/dashboard/cash-flow-report";
 import { ApiErrorState } from "@/components/feedback/api-error-state";
+import { PageHeader } from "@/components/layout/page-header";
 import { PaymentsFilterBar } from "@/components/feedback/payments-filter-bar";
 import { PaymentsSummaryCards } from "@/components/feedback/payments-summary-cards";
 import { getCompanyPaymentsSummary } from "@/lib/api/payments";
@@ -28,11 +29,7 @@ export default async function RelatoriosPage({
   } catch (error) {
     return (
       <div className="flex flex-col gap-6 animate-fade-in">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight text-foreground">
-            Fluxo de caixa
-          </h2>
-        </div>
+        <PageHeader context="Finanças" title="Fluxo de caixa" />
         <ApiErrorState error={error} />
       </div>
     );
@@ -40,16 +37,12 @@ export default async function RelatoriosPage({
 
   return (
     <div className="flex flex-col gap-6 animate-fade-in">
-      <div>
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Fluxo de caixa
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Entradas confirmadas por dia e por mês, e o resumo financeiro das
-          rotas da tua empresa.
-        </p>
-      </div>
-      <PaymentsFilterBar initial={filters} />
+      <PageHeader
+        context="Finanças"
+        title="Fluxo de caixa"
+        description="Entradas confirmadas por dia e por mês, e o resumo financeiro das rotas da tua empresa."
+        actions={<PaymentsFilterBar initial={filters} />}
+      />
       <PaymentsSummaryCards summary={summary} />
       <CashFlowReport byDay={summary.by_day} byMonth={summary.by_month} />
     </div>

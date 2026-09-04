@@ -1,4 +1,5 @@
 import { CashFlowReport } from "@/components/dashboard/cash-flow-report";
+import { PageHeader } from "@/components/layout/page-header";
 import { PaymentsFilterBar } from "@/components/feedback/payments-filter-bar";
 import { PaymentsSummaryCards } from "@/components/feedback/payments-summary-cards";
 import { getAdminPaymentsSummary } from "@/lib/api/admin";
@@ -21,16 +22,12 @@ export default async function AdminRelatoriosPage({
 
   return (
     <div className="flex flex-col gap-6 animate-fade-in">
-      <div>
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Fluxo de caixa
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Entradas confirmadas por dia e por mês, e o resumo financeiro global
-          da plataforma.
-        </p>
-      </div>
-      <PaymentsFilterBar initial={filters} />
+      <PageHeader
+        context="Plataforma · Finanças"
+        title="Fluxo de caixa"
+        description="Entradas confirmadas por dia e por mês, e o resumo financeiro global da plataforma."
+        actions={<PaymentsFilterBar initial={filters} />}
+      />
       <PaymentsSummaryCards summary={summary} />
       <CashFlowReport byDay={summary.by_day} byMonth={summary.by_month} />
     </div>
