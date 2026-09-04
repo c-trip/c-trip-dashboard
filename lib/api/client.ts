@@ -1,6 +1,6 @@
 import "server-only";
 
-import dns from "node:dns";
+// import dns from "node:dns";
 
 import axios, {
   AxiosError,
@@ -21,7 +21,7 @@ import { SESSION_COOKIE } from "@/lib/auth/constants";
 // de saída IPv6 — sem isto, o Node tenta ligar por IPv6 primeiro, a ligação
 // fica presa (sem erro, sem timeout do socket a disparar) e o pedido nunca
 // chega à API. Forçar IPv4 aqui resolve; ver Docs/ARQUITETURA_FRONTEND.md.
-dns.setDefaultResultOrder("ipv4first");
+// dns.setDefaultResultOrder("ipv4first");
 
 /**
  * Cliente HTTP central para a API FastAPI do C-Trip, baseado em Axios.
