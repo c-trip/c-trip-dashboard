@@ -1,5 +1,7 @@
 import "server-only";
 
+import dns from "node:dns";
+
 import axios, {
   AxiosError,
   AxiosHeaders,
@@ -13,6 +15,13 @@ import { redirect } from "next/navigation";
 import { API_URL, API_TIMEOUT_MS } from "@/constants/api_base";
 import { ApiError, parseApiError } from "@/lib/api/errors";
 import { SESSION_COOKIE } from "@/lib/auth/constants";
+
+// A API vive atrás de Cloudflare, que devolve registos AAAA (IPv6) e A (IPv4)
+// para o mesmo domínio. O runtime das Vercel Functions (Lambda) não tem rota
+// de saída IPv6 — sem isto, o Node tenta ligar por IPv6 primeiro, a ligação
+// fica presa (sem erro, sem timeout do socket a disparar) e o pedido nunca
+// chega à API. Forçar IPv4 aqui resolve; ver Docs/ARQUITETURA_FRONTEND.md.
+dns.setDefaultResultOrder("ipv4first");
 
 /**
  * Cliente HTTP central para a API FastAPI do C-Trip, baseado em Axios.
