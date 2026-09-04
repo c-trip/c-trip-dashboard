@@ -17,22 +17,28 @@ interface SimpleTableProps<T> {
   emptyDescription?: string;
 }
 
-export function SimpleTable<T>({ columns, rows, rowKey, emptyTitle, emptyDescription }: SimpleTableProps<T>) {
+export function SimpleTable<T>({
+  columns,
+  rows,
+  rowKey,
+  emptyTitle,
+  emptyDescription,
+}: SimpleTableProps<T>) {
   if (rows.length === 0) {
     return <EmptyState title={emptyTitle} description={emptyDescription} />;
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
+    <div className="overflow-x-auto rounded-xl border border-border bg-card">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-border bg-muted/70">
+          <tr className="border-b border-border">
             {columns.map((column) => (
               <th
                 key={column.header}
                 className={cn(
-                  "px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground",
-                  column.className
+                  "px-4 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground",
+                  column.className,
                 )}
               >
                 {column.header}
@@ -41,16 +47,16 @@ export function SimpleTable<T>({ columns, rows, rowKey, emptyTitle, emptyDescrip
           </tr>
         </thead>
         <tbody>
-          {rows.map((row, index) => (
+          {rows.map((row) => (
             <tr
               key={rowKey(row)}
-              className={cn(
-                "border-b border-border/60 transition-colors duration-150 last:border-0 hover:bg-muted/40",
-                index % 2 === 1 && "bg-muted/20"
-              )}
+              className="border-b border-border/60 transition-colors last:border-0 hover:bg-muted/40"
             >
               {columns.map((column) => (
-                <td key={column.header} className={cn("px-5 py-3.5", column.className)}>
+                <td
+                  key={column.header}
+                  className={cn("px-4 py-3 align-middle", column.className)}
+                >
                   {column.cell(row)}
                 </td>
               ))}

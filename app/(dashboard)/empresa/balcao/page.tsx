@@ -5,6 +5,8 @@ import {
   type BalcaoTrip,
 } from "@/components/operator/balcao-trip-list";
 import { ApiErrorState } from "@/components/feedback/api-error-state";
+import { MetricStrip, type Metric } from "@/components/dashboard/metric-strip";
+import { PageHeader } from "@/components/layout/page-header";
 import { getOperatorSchedules } from "@/lib/api/operator";
 import { getCompanyPaymentsSummary } from "@/lib/api/payments";
 import { getCompanyRoutes } from "@/lib/api/routes";
@@ -44,11 +46,7 @@ export default async function BalcaoPage({
   } catch (error) {
     return (
       <div className="flex flex-col gap-6 animate-fade-in">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight text-foreground">
-            Balcão
-          </h2>
-        </div>
+        <PageHeader context="Operação" title="Balcão" />
         <ApiErrorState error={error} />
       </div>
     );
@@ -71,26 +69,30 @@ export default async function BalcaoPage({
     price: priceByRoute.get(`${s.origin}→${s.destination}`) ?? null,
   }));
 
+  const openSeats = trips.reduce((sum, t) => sum + t.available_seats, 0);
+  const metrics: Metric[] = [
+    ...(todaySummary
+      ? ([
+          {
+            label: "Recebido hoje",
+            value: formatCurrency(todaySummary.total_confirmed),
+            accent: "positive",
+          },
+          { label: "Bilhetes hoje", value: todaySummary.count_confirmed },
+        ] as Metric[])
+      : []),
+    { label: "Viagens abertas", value: trips.length },
+    { label: "Lugares por vender", value: openSeats },
+  ];
+
   return (
     <div className="flex flex-col gap-6 animate-fade-in">
-      <div>
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Balcão
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Viagens com lugares à venda. Escolhe uma para vender um bilhete.
-          {todaySummary ? (
-            <>
-              {" · Recebido hoje "}
-              <span className="font-semibold tabular-nums text-foreground">
-                {formatCurrency(todaySummary.total_confirmed)}
-              </span>
-              {` em ${todaySummary.count_confirmed} bilhete(s)`}
-            </>
-          ) : null}
-        </p>
-      </div>
-
+      <PageHeader
+        context="Operação"
+        title="Balcão"
+        description="Viagens com lugares à venda. Escolhe uma para emitir um bilhete."
+      />
+      {metrics.length > 0 ? <MetricStrip metrics={metrics} /> : null}
       <BalcaoTripList trips={trips} date={date} />
     </div>
   );

@@ -1,5 +1,6 @@
 import { ValidatePanel } from "./validate-panel";
 import { ApiErrorState } from "@/components/feedback/api-error-state";
+import { PageHeader } from "@/components/layout/page-header";
 import { EmbarqueNav } from "@/components/operator/embarque-nav";
 import { SchedulePicker } from "@/components/operator/schedule-picker";
 import { getOperatorSchedules } from "@/lib/api/operator";
@@ -22,11 +23,7 @@ export default async function EmbarquePage({
   } catch (error) {
     return (
       <div className="flex flex-col gap-6 animate-fade-in">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight text-foreground">
-            Embarque
-          </h2>
-        </div>
+        <PageHeader context="Operação" title="Embarque" />
         <ApiErrorState error={error} />
       </div>
     );
@@ -36,16 +33,15 @@ export default async function EmbarquePage({
 
   return (
     <div className="flex max-w-2xl flex-col gap-6 animate-fade-in">
-      <div>
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Embarque
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {selected
+      <PageHeader
+        context="Operação"
+        title="Embarque"
+        description={
+          selected
             ? `${selected.origin} → ${selected.destination} · ${selected.departure_date} ${selected.departure_time}`
-            : "Escolhe a viagem para recusar bilhetes de outra."}
-        </p>
-      </div>
+            : "Escolhe a viagem para recusar bilhetes de outra."
+        }
+      />
 
       <div className="flex flex-wrap items-center gap-2">
         <SchedulePicker schedules={schedules} selected={scheduleId} />

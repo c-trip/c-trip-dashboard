@@ -2,6 +2,7 @@ import { unstable_rethrow } from "next/navigation";
 
 import { ReprintButton } from "./reprint-button";
 import { ApiErrorState } from "@/components/feedback/api-error-state";
+import { PageHeader } from "@/components/layout/page-header";
 import { EmbarqueNav } from "@/components/operator/embarque-nav";
 import { SchedulePicker } from "@/components/operator/schedule-picker";
 import { SimpleTable } from "@/components/tables/simple-table";
@@ -42,11 +43,7 @@ export default async function ManifestoPage({
   } catch (error) {
     return (
       <div className="flex flex-col gap-6 animate-fade-in">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight text-foreground">
-            Embarque
-          </h2>
-        </div>
+        <PageHeader context="Operação" title="Embarque · Manifesto" />
         <ApiErrorState error={error} />
       </div>
     );
@@ -60,21 +57,22 @@ export default async function ManifestoPage({
 
   return (
     <div className="flex max-w-2xl flex-col gap-6 animate-fade-in">
-      <div>
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Embarque
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {trip ? `${trip.origin} → ${trip.destination} · ` : null}
-          {detail
-            ? `${detail.departure_date} ${detail.departure_time} · `
-            : null}
-          <span className="font-medium text-foreground tabular-nums">
-            {boarded}/{confirmed.length}
-          </span>{" "}
-          embarcados
-        </p>
-      </div>
+      <PageHeader
+        context="Operação"
+        title="Embarque · Manifesto"
+        description={
+          <>
+            {trip ? `${trip.origin} → ${trip.destination} · ` : null}
+            {detail
+              ? `${detail.departure_date} ${detail.departure_time} · `
+              : null}
+            <span className="font-medium text-foreground tabular-nums">
+              {boarded}/{confirmed.length}
+            </span>{" "}
+            embarcados
+          </>
+        }
+      />
 
       <div className="flex flex-wrap items-center gap-2">
         <SchedulePicker schedules={schedules} selected={scheduleId} />

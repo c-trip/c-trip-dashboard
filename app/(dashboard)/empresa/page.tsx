@@ -2,8 +2,9 @@ import Link from "next/link";
 import { unstable_rethrow } from "next/navigation";
 
 import { ApiErrorState } from "@/components/feedback/api-error-state";
+import { MetricStrip, type Metric } from "@/components/dashboard/metric-strip";
+import { PageHeader } from "@/components/layout/page-header";
 import { RevenueChart } from "@/components/dashboard/revenue-chart";
-import { SectionCards, type SectionCardItem } from "@/components/section-cards";
 import { SimpleTable } from "@/components/tables/simple-table";
 import { StatusBadge } from "@/components/feedback/status-badge";
 import { getCompanyPaymentsSummary } from "@/lib/api/payments";
@@ -38,11 +39,7 @@ export default async function EmpresaOverviewPage() {
   if (!routes && !schedules && !summary) {
     return (
       <div className="flex flex-col gap-6 animate-fade-in">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight text-foreground">
-            Visão geral
-          </h2>
-        </div>
+        <PageHeader context="Empresa" title="Visão geral" />
         <ApiErrorState error={firstError} />
       </div>
     );
@@ -60,59 +57,47 @@ export default async function EmpresaOverviewPage() {
     )
     .slice(0, 5);
 
-  const cards: SectionCardItem[] = [];
+  const metrics: Metric[] = [];
   if (summary) {
-    cards.push(
+    metrics.push(
       {
-        description: "Receita confirmada",
+        label: "Receita confirmada",
         value: formatCurrency(summary.total_confirmed),
-        footerTitle: `${summary.count_confirmed} pagamento(s) confirmado(s)`,
-        footerSubtitle: "Ver pagamentos",
-        footerHref: "/empresa/pagamentos",
+        hint: `${summary.count_confirmed} pagamento(s)`,
+        accent: "positive",
+        href: "/empresa/pagamentos",
       },
       {
-        description: "A aguardar confirmação",
+        label: "A aguardar confirmação",
         value: formatCurrency(summary.total_pending),
-        footerTitle: `${summary.count_pending} pagamento(s) pendente(s)`,
-        footerSubtitle: "Processados pelo gateway",
+        hint: `${summary.count_pending} pagamento(s)`,
+        accent: "warning",
       },
     );
   }
   if (routes) {
-    cards.push({
-      description: "Rotas activas",
-      value: String(activeRoutes),
-      footerTitle:
-        activeRoutes === routes.length
-          ? "Todas as rotas activas"
-          : `${routes.length} no total`,
-      footerSubtitle: "Gerir rotas",
-      footerHref: "/empresa/rotas",
+    metrics.push({
+      label: "Rotas activas",
+      value: activeRoutes,
+      hint: `${routes.length} no total`,
+      href: "/empresa/rotas",
     });
   }
   if (schedules) {
-    cards.push({
-      description: "Viagens agendadas",
-      value: String(scheduledTrips.length),
-      footerTitle:
-        scheduledTrips.length > 0
-          ? "Com partida prevista"
-          : "Nenhuma viagem agendada",
-      footerSubtitle: "Ver horários",
-      footerHref: "/empresa/horarios",
+    metrics.push({
+      label: "Viagens agendadas",
+      value: scheduledTrips.length,
+      href: "/empresa/horarios",
     });
   }
 
   return (
-    <div className="@container/main -mx-4 flex flex-1 flex-col gap-4 md:-mx-8 md:gap-6 animate-fade-in">
-      {cards.length > 0 ? <SectionCards cards={cards} /> : null}
-      {summary ? (
-        <div className="px-4 lg:px-6">
-          <RevenueChart byMonth={summary.by_month} />
-        </div>
-      ) : null}
+    <div className="flex flex-col gap-6 animate-fade-in">
+      <PageHeader context="Empresa" title="Visão geral" />
+      {metrics.length > 0 ? <MetricStrip metrics={metrics} /> : null}
+      {summary ? <RevenueChart byMonth={summary.by_month} /> : null}
       {schedules ? (
-        <div className="flex flex-col gap-3 px-4 lg:px-6">
+        <div className="flex flex-col gap-3">
           <h3 className="text-sm font-semibold text-foreground">
             Próximas viagens
           </h3>
